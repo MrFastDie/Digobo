@@ -2,6 +2,7 @@ package help
 
 import (
 	"Digobo/discordBot/command"
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"time"
 )
@@ -20,6 +21,10 @@ func (this *Help) Description() string {
 	return "This command is ment to be helping you finding the right commands"
 }
 
+func (this *Help) Hidden() bool {
+	return false
+}
+
 func (this *Help) HasInteractions() bool {
 	return false
 }
@@ -33,22 +38,44 @@ func (this *Help) Execute(args string, s *discordgo.Session, m *discordgo.Messag
 
 	answerChannelID := m.ChannelID
 
+	var embed discordgo.MessageEmbed
 	var fields []*discordgo.MessageEmbedField
 
-	for k, v := range command.Commands.GetCommands() {
-		fields = append(fields, &discordgo.MessageEmbedField{Name: k, Value: v.Title(), Inline: false})
+	if args == "" {
+		for k, v := range command.Commands.GetCommands() {
+			fields = append(fields, &discordgo.MessageEmbedField{Name: k, Value: v.Title(), Inline: false})
+		}
+
+		embed = discordgo.MessageEmbed{
+			Title:       "Help",
+			Description: this.Description(),
+			Timestamp:   time.Now().Format(time.RFC3339),
+			Color:       0x00ff00,
+			Author:      &discordgo.MessageEmbedAuthor{},
+			Fields:      fields,
+		}
+	} else {
+		getCommand, err := command.Commands.GetCommand(args)
+		if err != nil {
+			embed = discordgo.MessageEmbed{
+				Title:       "Not found",
+				Description: fmt.Sprintf("The command %s could not be found!", args),
+				Timestamp:   time.Now().Format(time.RFC3339),
+				Color:       0x00ff00,
+				Author:      &discordgo.MessageEmbedAuthor{},
+			}
+		} else {
+			embed = discordgo.MessageEmbed{
+				Title:       getCommand.Title(),
+				Description: getCommand.Description(),
+				Timestamp:   time.Now().Format(time.RFC3339),
+				Color:       0x00ff00,
+				Author:      &discordgo.MessageEmbedAuthor{},
+			}
+		}
 	}
 
-	embed := &discordgo.MessageEmbed{
-		Title:       "Help",
-		Description: this.Description(),
-		Timestamp:   time.Now().Format(time.RFC3339),
-		Color:       0x00ff00,
-		Author:      &discordgo.MessageEmbedAuthor{},
-		Fields:      fields,
-	}
-
-	s.ChannelMessageSendEmbed(answerChannelID, embed)
+	s.ChannelMessageSendEmbed(answerChannelID, &embed)
 
 	return nil
 }

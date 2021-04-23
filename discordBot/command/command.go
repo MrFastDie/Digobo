@@ -15,6 +15,11 @@ type Command interface {
 	// A brief title of this command
 	Title() string
 
+	// Is this command hidden from help?
+	Hidden() bool
+
+	// TODO permissions
+
 	// A short description for this command
 	Description() string
 

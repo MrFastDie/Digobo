@@ -8,6 +8,7 @@ import (
 	// load commands when we use the bot
 	_ "Digobo/discordBot/command/commands/help"
 	_ "Digobo/discordBot/command/commands/ping"
+	_ "Digobo/discordBot/command/commands/randomGayLinkAnswer"
 )
 
 var serveCmd = &cobra.Command{

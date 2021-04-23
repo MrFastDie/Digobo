@@ -7,6 +7,13 @@ import (
 )
 
 type configFile struct {
+	Database struct {
+		Name     string `yaml:"name"`
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
+		Host     string `yaml:"host"`
+		Port     int    `yaml:"port"`
+	} `yaml:"database"`
 	Discord struct {
 		Token string `yaml:"token"`
 	} `yaml:"discord"`
@@ -14,6 +21,10 @@ type configFile struct {
 		Lvl      string `yaml:"lvl"`
 		ToStdout bool   `yaml:"to-stdout"`
 	} `yaml:"log"`
+	Bot struct {
+		CommandPrefix     string `yaml:"command-prefix"`
+		DefaultEmbedColor int    `yaml:"default-embed-color"`
+	} `yaml:"bot"`
 }
 
 var Config configFile

@@ -1,11 +1,11 @@
 package ping
 
 import (
+	"Digobo/config"
 	"Digobo/discordBot"
 	"Digobo/discordBot/command"
 	"Digobo/log"
 	"github.com/bwmarrin/discordgo"
-	"github.com/kr/pretty"
 	"time"
 )
 
@@ -21,6 +21,10 @@ func (this *Ping) Title() string {
 
 func (this *Ping) Description() string {
 	return "This is an example module for commands"
+}
+
+func (this *Ping) Hidden() bool {
+	return false
 }
 
 func (this *Ping) HasInteractions() bool {
@@ -55,7 +59,7 @@ func (this *Ping) Execute(args string, s *discordgo.Session, m *discordgo.Messag
 		Title:       "Pong!",
 		Description: "This is the Pong! embed",
 		Timestamp:   time.Now().Format(time.RFC3339),
-		Color:       0x00ff00,
+		Color:       config.Config.Bot.DefaultEmbedColor,
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Fields:      []*discordgo.MessageEmbedField{
 			&discordgo.MessageEmbedField{
@@ -71,17 +75,7 @@ func (this *Ping) Execute(args string, s *discordgo.Session, m *discordgo.Messag
 		},
 	}
 
-	// If the message is "ping" reply with "Pong!"
-	if m.Content == "ping" {
-		message, _ := s.ChannelMessageSendEmbed(answerChannelID, embed)
-		pretty.Println(m)
-		pretty.Println(message)
-	}
-
-	// If the message is "pong" reply with "Ping!"
-	if m.Content == "pong" {
-		s.ChannelMessageSend(answerChannelID, "Ping!")
-	}
+	s.ChannelMessageSendEmbed(answerChannelID, embed)
 
 	return nil
 }

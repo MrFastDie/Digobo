@@ -30,6 +30,20 @@ func Run() {
 		return
 	}
 
+	err = dg.UpdateStatusComplex(discordgo.UpdateStatusData{
+		Activities: []*discordgo.Activity{
+			&discordgo.Activity{
+				Name: "\U0001F970",
+				Type: 5,
+			},
+		},
+		Status:     "online",
+	})
+
+	if err != nil {
+		log.Warning.Println("can't update Bot's status", err)
+	}
+
 	// Wait here until CTRL-C or other term signal is received.
 	log.Info.Println("Discord bot Digobo is now running.")
 	sc := make(chan os.Signal, 1)

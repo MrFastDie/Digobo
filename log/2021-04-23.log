@@ -32,3 +32,88 @@ Info: 2021/04/23 13:11:42 bot.go:19: Starting Discord bot Digobo
 Info: 2021/04/23 13:11:43 discordBot.go:34: Discord bot Digobo is now running.
 Info: 2021/04/23 13:12:43 bot.go:19: Starting Discord bot Digobo
 Info: 2021/04/23 13:12:44 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 13:46:31 bot.go:19: Starting Discord bot Digobo
+Info: 2021/04/23 13:46:33 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 13:47:32 bot.go:19: Starting Discord bot Digobo
+Info: 2021/04/23 13:47:33 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 13:48:41 bot.go:19: Starting Discord bot Digobo
+Info: 2021/04/23 13:48:43 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 13:51:18 bot.go:19: Starting Discord bot Digobo
+Info: 2021/04/23 13:51:20 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 13:59:04 bot.go:19: Starting Discord bot Digobo
+Info: 2021/04/23 13:59:06 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 14:20:57 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 14:21:02 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 14:21:50 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 14:21:51 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 15:27:41 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 15:27:42 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 15:39:28 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 15:39:30 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 15:42:24 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 15:42:27 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 15:45:16 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 15:45:18 discordBot.go:34: Discord bot Digobo is now running.
+Warning: 2021/04/23 15:45:26 randomGayLinkAnswer.go:53: cant add random gay link to DB pq: doppelter Schlüsselwert verletzt Unique-Constraint »random_answer_list_pk_2«
+Info: 2021/04/23 15:52:48 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 15:52:52 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 15:54:15 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 15:54:18 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 15:54:52 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 15:54:53 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 15:56:37 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 15:56:39 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 15:57:36 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 15:57:37 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 15:59:10 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 15:59:11 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 15:59:37 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 15:59:39 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:00:33 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:00:34 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:01:19 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:01:21 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:01:45 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:01:46 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:02:43 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:02:45 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:03:05 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:03:07 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:10:06 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:10:07 discordBot.go:34: Discord bot Digobo is now running.
+Warning: 2021/04/23 16:10:24 randomGayLinkAnswer.go:53: cant add random gay link to DB pq: got 2 parameters but the statement requires 3
+Info: 2021/04/23 16:10:50 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:10:51 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:24:07 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:24:09 discordBot.go:37: Discord bot Digobo is now running.
+Info: 2021/04/23 16:24:39 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:24:42 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:25:37 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:25:38 discordBot.go:38: Discord bot Digobo is now running.
+Info: 2021/04/23 16:29:31 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:29:33 discordBot.go:46: Discord bot Digobo is now running.
+Info: 2021/04/23 16:30:53 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:30:54 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:32:28 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:32:30 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:33:22 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:33:23 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:37:39 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:37:41 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:39:26 bot.go:20: Starting Discord bot Digobo
+Warning: 2021/04/23 16:39:26 discordBot.go:28: can't update Bot's status no websocket connection exists
+Info: 2021/04/23 16:39:27 discordBot.go:45: Discord bot Digobo is now running.
+Info: 2021/04/23 16:39:47 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:39:48 discordBot.go:45: Discord bot Digobo is now running.
+Info: 2021/04/23 16:42:16 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:42:18 discordBot.go:34: Discord bot Digobo is now running.
+Info: 2021/04/23 16:45:44 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:45:46 discordBot.go:50: Discord bot Digobo is now running.
+Info: 2021/04/23 16:47:00 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:47:01 discordBot.go:52: Discord bot Digobo is now running.
+Info: 2021/04/23 16:48:24 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:48:27 discordBot.go:50: Discord bot Digobo is now running.
+Info: 2021/04/23 16:48:40 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:48:41 discordBot.go:48: Discord bot Digobo is now running.
+Info: 2021/04/23 16:49:50 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:49:51 discordBot.go:48: Discord bot Digobo is now running.
