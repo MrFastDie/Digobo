@@ -43,6 +43,10 @@ func (this *Help) Execute(args string, s *discordgo.Session, m *discordgo.Messag
 
 	if args == "" {
 		for k, v := range command.Commands.GetCommands() {
+			if v.Hidden() {
+				continue
+			}
+
 			fields = append(fields, &discordgo.MessageEmbedField{Name: k, Value: v.Title(), Inline: false})
 		}
 

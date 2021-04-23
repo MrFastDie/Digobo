@@ -20,7 +20,7 @@ func (this *RandomGayLinkAnswer) Title() string {
 }
 
 func (this *RandomGayLinkAnswer) Description() string {
-	return "Returns a random gay porn link (include a + or - with a following link to add or delete it to the database)"
+	return "Returns a random gay porn link (include a + or - with a following link to add or delete it in the database)"
 }
 
 func (this *RandomGayLinkAnswer) Hidden() bool {

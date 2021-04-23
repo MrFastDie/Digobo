@@ -3,6 +3,7 @@ package discordBot
 import (
 	"Digobo/config"
 	"Digobo/discordBot/command"
+	"Digobo/log"
 	"github.com/bwmarrin/discordgo"
 	"strings"
 )
@@ -10,12 +11,13 @@ import (
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the authenticated bot has access to.
 func mainLoop(s *discordgo.Session, m *discordgo.MessageCreate) {
-
 	// Ignore all messages created by the bot itself
 	// This isn't required in this specific example but it's a good practice.
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
+
+	log.Debug.Printf("Received message: %s\n", m.Content)
 
 	// TODO check if msg of user could be an answer to smth if we have modals (middlewares)
 	// TODO specific server settings through middleware such as languages

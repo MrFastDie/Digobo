@@ -117,3 +117,16 @@ Info: 2021/04/23 16:48:40 bot.go:20: Starting Discord bot Digobo
 Info: 2021/04/23 16:48:41 discordBot.go:48: Discord bot Digobo is now running.
 Info: 2021/04/23 16:49:50 bot.go:20: Starting Discord bot Digobo
 Info: 2021/04/23 16:49:51 discordBot.go:48: Discord bot Digobo is now running.
+Info: 2021/04/23 16:51:55 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:51:56 discordBot.go:48: Discord bot Digobo is now running.
+Info: 2021/04/23 16:56:54 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 16:56:57 discordBot.go:48: Discord bot Digobo is now running.
+Debug: 2021/04/23 16:57:01 mainLoop.go:20: Received message: 🏳️‍🌈
+Debug: 2021/04/23 16:58:24 mainLoop.go:20: Received message: 🌈
+Debug: 2021/04/23 16:58:51 mainLoop.go:20: Received message: <:crusefSus:763779789260849184>
+Debug: 2021/04/23 16:58:58 mainLoop.go:20: Received message: <:crusefSus:763779789260849184>
+Debug: 2021/04/23 17:01:27 mainLoop.go:20: Received message: help
+Info: 2021/04/23 17:02:09 bot.go:20: Starting Discord bot Digobo
+Info: 2021/04/23 17:02:11 discordBot.go:48: Discord bot Digobo is now running.
+Debug: 2021/04/23 17:02:13 mainLoop.go:20: Received message: help
+Debug: 2021/04/23 17:02:23 mainLoop.go:20: Received message: help 🥰
