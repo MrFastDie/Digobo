@@ -11,7 +11,6 @@ var instance *scheduler
 
 type scheduler struct {
 	currentJobs   chan Job
-	waitGroup     sync.WaitGroup
 	thresholdJobs struct {
 		jobs  []Job
 		mutex sync.RWMutex
@@ -22,14 +21,11 @@ func GetScheduler() *scheduler {
 	if instance == nil {
 		instance = &scheduler{
 			currentJobs: make(chan Job),
-			waitGroup: sync.WaitGroup{},
 			thresholdJobs: struct {
 				jobs  []Job
 				mutex sync.RWMutex
 			}{},
 		}
-
-		instance.waitGroup.Add(1)
 	}
 
 	return instance
@@ -38,8 +34,6 @@ func GetScheduler() *scheduler {
 // Insert job to be executed instantly
 func (this *scheduler) AddScheduledJob(job Job) error {
 	this.currentJobs <- job
-
-	this.waitGroup.Add(1)
 
 	return nil
 }
