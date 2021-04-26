@@ -35,7 +35,7 @@ func GetScheduler() *scheduler {
 	return instance
 }
 
-// Insert job to be executed instandly
+// Insert job to be executed instantly
 func (this *scheduler) AddScheduledJob(job Job) error {
 	this.currentJobs <- job
 
@@ -82,7 +82,7 @@ func (this *scheduler) run() {
 		case job := <-this.currentJobs:
 			err := job.ExecutionFunc.Execute(job.Data)
 			if err != nil {
-				log.Warning.Println("Could not execute scheduled job", err)
+				log.Warning.Println("could not execute scheduled job", err)
 			}
 		}
 	}
