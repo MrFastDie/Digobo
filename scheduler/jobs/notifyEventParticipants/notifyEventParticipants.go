@@ -44,7 +44,7 @@ func (this *NotifyEventParticipants) Execute(data string) error {
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Fields: []*discordgo.MessageEmbedField{
 			&discordgo.MessageEmbedField{
-				Name:   "Debugdata",
+				Name:   "Debugdata", // TODO remove
 				Value:  string(parentEventStr),
 				Inline: true,
 			},
