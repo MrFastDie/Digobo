@@ -20,7 +20,7 @@ type scheduler struct {
 func GetScheduler() *scheduler {
 	if instance == nil {
 		instance = &scheduler{
-			currentJobs: make(chan Job),
+			currentJobs: make(chan Job, 1000),
 			thresholdJobs: struct {
 				jobs  []Job
 				mutex sync.RWMutex

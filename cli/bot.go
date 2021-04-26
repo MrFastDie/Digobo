@@ -3,11 +3,16 @@ package cli
 import (
 	"Digobo/discordBot"
 	"Digobo/log"
+	"Digobo/scheduler/jobs/crawlReminderEvents"
 	"github.com/spf13/cobra"
+	"time"
+
 	// load commands when we use the bot
 	_ "Digobo/discordBot/command/commands/help"
 	_ "Digobo/discordBot/command/commands/ping"
 	_ "Digobo/discordBot/command/commands/randomGayLinkAnswer"
+
+	_ "Digobo/scheduler"
 )
 
 var serveCmd = &cobra.Command{
@@ -17,6 +22,8 @@ var serveCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Info.Println("Starting Discord bot Digobo")
+
+		crawlReminderEvents.CrawlReminderEventJobStart(time.Now(), "")
 
 		discordBot.Run()
 	},
