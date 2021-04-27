@@ -60,7 +60,7 @@ func (this *CrawlReminderEvents) Execute(data string) error {
 		notify.ParentEventUuid = notifyEvent.ParentEvent
 		notify.NotifyChannels = eventData.NotifyChannels
 		notify.NotifyUsers = eventData.NotifyUsers
-		notify.OriginDate = notifyEvent.Occurrences.Time
+		notify.OriginDate = notifyEvent.Occurrences
 
 		notifyByteData, err := json.Default.Marshal(notify)
 		if err != nil {

@@ -15,3 +15,7 @@ func (t *TimestampWithoutTimezone) UnmarshalJSON(data []byte) error {
 	}
 	return err
 }
+
+func (t *TimestampWithoutTimezone) MarshalJSON() ([]byte, error) {
+	return []byte(t.Time.Format("\"2006-01-02T15:04:05\"")), nil
+}

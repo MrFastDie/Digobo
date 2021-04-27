@@ -11,10 +11,10 @@ import (
 )
 
 type Data struct {
-	ParentEventUuid string    `json:"parent_event_uuid"`
-	NotifyChannels  []string  `json:"notify_channels"`
-	NotifyUsers     []string  `json:"notify_users"`
-	OriginDate      time.Time `json:"origin_time"`
+	ParentEventUuid string                        `json:"parent_event_uuid"`
+	NotifyChannels  []string                      `json:"notify_channels"`
+	NotifyUsers     []string                      `json:"notify_users"`
+	OriginDate      json.TimestampWithoutTimezone `json:"origin_time"`
 }
 
 type NotifyEventParticipants struct{}
@@ -39,7 +39,7 @@ func (this *NotifyEventParticipants) Execute(data string) error {
 	embed := &discordgo.MessageEmbed{
 		Title:       parentEvent.Title,
 		Description: parentEvent.Description,
-		Timestamp:   notifyData.OriginDate.Format(time.RFC3339),
+		Timestamp:   notifyData.OriginDate.Time.Format(time.RFC3339),
 		Color:       config.Config.Bot.DefaultEmbedColor,
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Fields: []*discordgo.MessageEmbedField{
