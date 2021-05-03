@@ -38,7 +38,7 @@ func (this *RandomGayLinkAnswer) Execute(args string, s *discordgo.Session, m *d
 		return nil
 	}
 
-	link, err := database.GetRandomAnswerListValueByCommand(this.Name())
+	link, err := database.GetKeyValuePairByCommand(this.Name())
 	if err != nil {
 		log.Error.Println("cant fetch a random gay link from DB", err)
 		return err
@@ -48,7 +48,7 @@ func (this *RandomGayLinkAnswer) Execute(args string, s *discordgo.Session, m *d
 		parts := strings.SplitN(args, " ", 2)
 
 		if parts[0] == "+" {
-			err := database.AddRandomAnswerListValueByCommand(this.Name(), parts[1], m.Author.ID)
+			err := database.AddKeyValuePairByCommand(this.Name(), parts[1], m.Author.ID)
 			if err != nil {
 				log.Error.Println("cant add random gay link to DB", err)
 				return err
@@ -58,7 +58,7 @@ func (this *RandomGayLinkAnswer) Execute(args string, s *discordgo.Session, m *d
 		}
 
 		if parts[0] == "-" {
-			err := database.RemoveRandomAnswerListValueByCommandAndValue(this.Name(), parts[1])
+			err := database.RemoveKeyValuePairByCommandAndValue(this.Name(), parts[1])
 			if err != nil {
 				log.Error.Println("cant delete random gay link from DB", err)
 				return err
@@ -68,7 +68,12 @@ func (this *RandomGayLinkAnswer) Execute(args string, s *discordgo.Session, m *d
 		}
 	}
 
-	s.ChannelMessageSend(m.ChannelID, link)
+	_, err = s.ChannelMessageSend(m.ChannelID, link)
+	if err != nil {
+		log.Error.Println("can't send embed", err)
+		return err
+	}
+
 
 	return nil
 }

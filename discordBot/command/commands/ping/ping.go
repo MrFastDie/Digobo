@@ -75,7 +75,12 @@ func (this *Ping) Execute(args string, s *discordgo.Session, m *discordgo.Messag
 		},
 	}
 
-	s.ChannelMessageSendEmbed(answerChannelID, embed)
+	_, err = s.ChannelMessageSendEmbed(answerChannelID, embed)
+	if err != nil {
+		log.Error.Println("can't send embed", err)
+		return err
+	}
+
 
 	return nil
 }

@@ -32,7 +32,7 @@ func (this *NotifyEventParticipants) Execute(data string) error {
 		return err
 	}
 
-	var dinstance = discordBot.GetInstance()
+	var discordBotInstance = discordBot.GetInstance()
 
 	parentEventStr, _ := json.Default.Marshal(parentEvent)
 
@@ -52,13 +52,13 @@ func (this *NotifyEventParticipants) Execute(data string) error {
 	}
 
 	for _, notifyUser := range notifyData.NotifyUsers {
-		channel, err := dinstance.UserChannelCreate(notifyUser)
+		channel, err := discordBotInstance.UserChannelCreate(notifyUser)
 		if err != nil {
 			log.Warning.Println("can't create channel with discord user to notify", err)
 			continue
 		}
 
-		_, err = dinstance.ChannelMessageSendEmbed(channel.ID, embed)
+		_, err = discordBotInstance.ChannelMessageSendEmbed(channel.ID, embed)
 		if err != nil {
 			log.Warning.Println("couldn't send embed to discord user for notify", err)
 			continue
@@ -66,7 +66,7 @@ func (this *NotifyEventParticipants) Execute(data string) error {
 	}
 
 	for _, notifyChannel := range notifyData.NotifyChannels {
-		_, err := dinstance.ChannelMessageSendEmbed(notifyChannel, embed)
+		_, err := discordBotInstance.ChannelMessageSendEmbed(notifyChannel, embed)
 		if err != nil {
 			log.Warning.Println("couldn't send embed to discord server channel for notify", err)
 			continue

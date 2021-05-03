@@ -2,18 +2,18 @@ package database
 
 import "Digobo/json"
 
-type RandomAnswerList struct {
+type KeyValuePair struct {
 	Uuid      string `db:"uuid" json:"uuid"`
 	Command   string `db:"command" json:"command"`
 	Value     string `db:"value" json:"value"`
 	DiscordID string `db:"discord_id" json:"discord_id"`
 }
 
-func (this *RandomAnswerList) Scan(src interface{}) error {
+func (this *KeyValuePair) Scan(src interface{}) error {
 	return json.Unmarshal(src, this)
 }
 
-func GetRandomAnswerListValueByCommand(command string) (string, error) {
+func GetKeyValuePairByCommand(command string) (string, error) {
 	var ret string
 
 	err := db.Get(&ret, `SELECT value FROM random_answer_list WHERE command = $1 ORDER BY random() limit 1`, command)
@@ -24,13 +24,13 @@ func GetRandomAnswerListValueByCommand(command string) (string, error) {
 	return ret, nil
 }
 
-func AddRandomAnswerListValueByCommand(command string, value string, discordId string) error {
+func AddKeyValuePairByCommand(command string, value string, discordId string) error {
 	_, err := db.Exec(`INSERT INTO random_answer_list (command, value, discord_id) VALUES ($1, $2, $3)`, command, value, discordId)
 
 	return err
 }
 
-func RemoveRandomAnswerListValueByCommandAndValue(command string, value string) error {
+func RemoveKeyValuePairByCommandAndValue(command string, value string) error {
 	_, err := db.Exec(`DELETE FROM random_answer_list WHERE command = $1 AND value = $2`, command, value)
 
 	return err

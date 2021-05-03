@@ -2,6 +2,7 @@ package help
 
 import (
 	"Digobo/discordBot/command"
+	"Digobo/log"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"time"
@@ -18,7 +19,7 @@ func (this *Help) Title() string {
 }
 
 func (this *Help) Description() string {
-	return "This command is ment to be helping you finding the right commands"
+	return "The purpose of this command is to help you find the right commands"
 }
 
 func (this *Help) Hidden() bool {
@@ -79,7 +80,12 @@ func (this *Help) Execute(args string, s *discordgo.Session, m *discordgo.Messag
 		}
 	}
 
-	s.ChannelMessageSendEmbed(answerChannelID, &embed)
+	_, err := s.ChannelMessageSendEmbed(answerChannelID, &embed)
+	if err != nil {
+		log.Error.Println("can't send embed", err)
+		return err
+	}
+
 
 	return nil
 }

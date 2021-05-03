@@ -31,7 +31,7 @@ func (this *CrawlReminderEvents) Execute(data string) error {
 			return err
 		}
 
-		// compare arrays and delete occurences from array prevRunEvents out of the actual events array
+		// compare arrays and delete occurrences from array prevRunEvents out of the actual events array
 		for i := 0; i < len(events); {
 			exists := false
 			for _, b := range prevRunEvents {

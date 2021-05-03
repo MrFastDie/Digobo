@@ -14,20 +14,16 @@ import (
 var db dbx.DBAccess
 
 func Init() {
-	db, _ = connect(config.Config.Database.Name, config.Config.Database.Username, config.Config.Database.Password, config.Config.Database.Host, config.Config.Database.Port)
+	db, _ = connect()
 }
 
-func TestDatabase(name, user, password, host string, port int) bool {
-	_, err := connect(name, user, password, host, port)
+func TestDatabase() error {
+	_, err := connect()
 
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err
 }
 
-func connect(name, user, password, host string, port int) (dbx.DBAccess, error) {
+func connect() (dbx.DBAccess, error) {
 	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.Config.Database.Username, config.Config.Database.Password, config.Config.Database.Host, config.Config.Database.Port, config.Config.Database.Password)
 	dbx.Configure("postgres", connString)
 	dbx.QuoteIdentifier = pq.QuoteIdentifier
