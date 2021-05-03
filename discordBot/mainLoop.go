@@ -29,7 +29,7 @@ func mainLoop(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	commandParts[0] = strings.TrimPrefix(commandParts[0], config.Config.Bot.CommandPrefix)
 
-	command, err := command.Commands.GetCommand(commandParts[0])
+	executedCommand, err := command.Commands.GetCommand(commandParts[0])
 	if err != nil {
 		return
 	}
@@ -39,7 +39,7 @@ func mainLoop(s *discordgo.Session, m *discordgo.MessageCreate) {
 		args = commandParts[1]
 	}
 
-	err = command.Execute(args, s, m)
+	err = executedCommand.Execute(args, s, m)
 	if err != nil {
 		s.ChannelMessageSend(m.ChannelID, "An error occured - please try again")
 	}
