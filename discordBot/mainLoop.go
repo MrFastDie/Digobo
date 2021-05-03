@@ -41,6 +41,9 @@ func mainLoop(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	err = executedCommand.Execute(args, s, m)
 	if err != nil {
-		s.ChannelMessageSend(m.ChannelID, "An error occured - please try again")
+		_, err = s.ChannelMessageSend(m.ChannelID, "An error occured - please try again")
+		if err != nil {
+			log.Error.Println("cant send server message", err)
+		}
 	}
 }
