@@ -54,7 +54,7 @@ func GetUserBeatmaps(userId int, beatmapType BeatmapType) UserBeatmapsResult {
 	client := &http.Client{}
 
 	if FAVORITE&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_FAVORITE))
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_FAVORITE + "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.Favorite)
 		if err != nil {
@@ -63,7 +63,7 @@ func GetUserBeatmaps(userId int, beatmapType BeatmapType) UserBeatmapsResult {
 	}
 
 	if GRAVEYARD&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_GRAVEYARD))
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_GRAVEYARD + "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.Graveyard)
 		if err != nil {
@@ -72,7 +72,7 @@ func GetUserBeatmaps(userId int, beatmapType BeatmapType) UserBeatmapsResult {
 	}
 
 	if LOVED&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_LOVED))
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_LOVED + "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.Loved)
 		if err != nil {
@@ -81,7 +81,7 @@ func GetUserBeatmaps(userId int, beatmapType BeatmapType) UserBeatmapsResult {
 	}
 
 	if MOST_PLAYED&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_MOST_PLAYED))
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_MOST_PLAYED + "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.MostPlayer)
 		if err != nil {
@@ -90,7 +90,7 @@ func GetUserBeatmaps(userId int, beatmapType BeatmapType) UserBeatmapsResult {
 	}
 
 	if PENDING&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_PENDING))
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_PENDING + "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.Pending)
 		if err != nil {
@@ -99,7 +99,7 @@ func GetUserBeatmaps(userId int, beatmapType BeatmapType) UserBeatmapsResult {
 	}
 
 	if RANKED&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_RANKED))
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_RANKED + "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.Ranked)
 		if err != nil {
