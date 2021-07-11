@@ -25,6 +25,11 @@ type configFile struct {
 		CommandPrefix     string `yaml:"command-prefix"`
 		DefaultEmbedColor int    `yaml:"default-embed-color"`
 	} `yaml:"bot"`
+	Apps struct  {
+		Osu struct {
+			Token string `yaml:"token"`
+		} `yaml:"osu"`
+	} `yaml:"apps"`
 }
 
 var Config configFile

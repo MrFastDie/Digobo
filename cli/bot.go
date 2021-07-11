@@ -3,12 +3,14 @@ package cli
 import (
 	"Digobo/discordBot"
 	"Digobo/log"
+	CrawlOsuProfiles "Digobo/scheduler/jobs/crawlOsuProfiles"
 	"Digobo/scheduler/jobs/crawlReminderEvents"
 	"github.com/spf13/cobra"
 	"time"
 
 	// load commands when we use the bot
 	_ "Digobo/discordBot/command/commands/help"
+	_ "Digobo/discordBot/command/commands/osuStalker"
 	_ "Digobo/discordBot/command/commands/ping"
 	_ "Digobo/discordBot/command/commands/randomGayLinkAnswer"
 
@@ -24,6 +26,7 @@ var serveCmd = &cobra.Command{
 		log.Info.Println("Starting Discord bot Digobo")
 
 		crawlReminderEvents.CrawlReminderEventJobStart(time.Now(), "")
+		CrawlOsuProfiles.CrawlOsuProfilesJobStart(time.Now(), "")
 
 		discordBot.Run()
 	},
