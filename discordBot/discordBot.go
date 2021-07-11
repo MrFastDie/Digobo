@@ -9,7 +9,7 @@ import (
 	"syscall"
 )
 
-var instance * discordgo.Session
+var instance *discordgo.Session
 
 func GetInstance() *discordgo.Session {
 	var err error
@@ -50,6 +50,12 @@ func Run() {
 		return
 	}
 
+	//emoji := discordgo.Emoji{
+	//	Name:     "gaykittyinlove",
+	//	ID:       "863801094152126504",
+	//	Animated: false,
+	//}
+
 	err = instance.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Activities: []*discordgo.Activity{
 			&discordgo.Activity{
@@ -57,7 +63,7 @@ func Run() {
 				Type: 5,
 			},
 		},
-		Status:     "online",
+		Status: "online",
 	})
 
 	if err != nil {
