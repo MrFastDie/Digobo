@@ -51,8 +51,8 @@ func Run() {
 	}
 
 	//emoji := discordgo.Emoji{
-	//	Name:     "gaykittyinlove",
-	//	ID:       "863801094152126504",
+	//	Name:     "smiling_face_with_3_hearts",
+	//	ID:       "863797433845547048",
 	//	Animated: false,
 	//}
 

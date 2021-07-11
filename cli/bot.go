@@ -10,7 +10,6 @@ import (
 
 	// load commands when we use the bot
 	_ "Digobo/discordBot/command/commands/help"
-	_ "Digobo/discordBot/command/commands/osuStalker"
 	_ "Digobo/discordBot/command/commands/ping"
 	_ "Digobo/discordBot/command/commands/randomGayLinkAnswer"
 
