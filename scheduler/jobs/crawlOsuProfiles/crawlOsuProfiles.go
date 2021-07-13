@@ -2,7 +2,6 @@ package CrawlOsuProfiles
 
 import (
 	"Digobo/apps/osu"
-	"Digobo/apps/osu/model/user"
 	"Digobo/config"
 	"Digobo/database"
 	"Digobo/discordBot"
@@ -72,7 +71,7 @@ func (this *CrawlOsuProfiles) Execute(rawData string) error {
 	return nil
 }
 
-func notifyChannel(dbData database.OsuUserBeatmaps, beatmapType string, data []user.UserBeatmaps) {
+func notifyChannel(dbData database.OsuUserBeatmaps, beatmapType string, data []osu.UserBeatmaps) {
 	var embedData []*discordgo.MessageEmbedField
 
 	for _, beatmap := range data {

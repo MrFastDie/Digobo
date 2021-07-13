@@ -1,7 +1,6 @@
 package osu
 
 import (
-	"Digobo/apps/osu/model/user"
 	"Digobo/config"
 	"Digobo/json"
 	"Digobo/log"
@@ -14,12 +13,12 @@ const OSU_API_URL = "https://osu.ppy.sh"
 type BeatmapType int
 
 type UserBeatmapsResult struct {
-	Favorite   []user.UserBeatmaps
-	Graveyard  []user.UserBeatmaps
-	Loved      []user.UserBeatmaps
-	MostPlayer []user.UserBeatmaps
-	Pending    []user.UserBeatmaps
-	Ranked     []user.UserBeatmaps
+	Favorite   []UserBeatmaps
+	Graveyard  []UserBeatmaps
+	Loved      []UserBeatmaps
+	MostPlayer []UserBeatmaps
+	Pending    []UserBeatmaps
+	Ranked     []UserBeatmaps
 }
 
 const (
