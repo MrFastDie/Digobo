@@ -40,6 +40,8 @@ func (this *CrawlOsuProfiles) Execute(rawData string) error {
 		return err
 	}
 
+	var notifyData []*discordgo.MessageEmbed
+
 	for _, osuDataSet := range osuData {
 		if recentActivityId == osuDataSet.Id {
 			break
@@ -55,9 +57,13 @@ func (this *CrawlOsuProfiles) Execute(rawData string) error {
 			osu.EVENT_TYPE_BEATMAPSET_UPLOAD,
 			osu.EVENT_TYPE_RANK,
 			osu.EVENT_TYPE_RANK_LOST:
-			notifyChannel(data.OutputChannel, osuDataSet.PrepareEmbed(data.UserName, data.UserId))
+			notifyData = append(notifyData, osuDataSet.PrepareEmbed(data.UserName, data.UserId))
 			break
 		}
+	}
+
+	for i := len(notifyData)-1; i >= 0; i-- {
+		notifyChannel(data.OutputChannel, notifyData[i])
 	}
 
 	if len(osuData) > 0 {
