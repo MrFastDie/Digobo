@@ -82,7 +82,7 @@ func (this *CrawlOsuProfiles) Execute(rawData string) error {
 		}
 	}
 
-	CrawlOsuProfilesJobStart(time.Now().Add(30*time.Minute), rawData)
+	CrawlOsuProfilesJobStart(time.Now().Add(5*time.Minute), rawData)
 
 	return nil
 }

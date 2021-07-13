@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"Digobo/database"
 	"Digobo/discordBot"
 	"Digobo/log"
 	CrawlOsuProfiles "Digobo/scheduler/jobs/crawlOsuProfiles"
@@ -27,32 +28,21 @@ var serveCmd = &cobra.Command{
 
 		crawlReminderEvents.CrawlReminderEventJobStart(time.Now(), "")
 
-		const TEST_CHANNEL = "835175407216623727"
-		const BROADCAST_CHANNEL = "863777071113043989"
+		osuWatcher, err := database.GetOsuWatcher()
+		if err != nil {
+			log.Error.Fatal("can't fetch osu watcher", err)
+			return
+		}
 
-		createCrawlEvent(
-			15817570,
-			"MrFastDie",
-			BROADCAST_CHANNEL,
-		)
-
-		createCrawlEvent(
-			22106410,
-			"AmateurUwU",
-			BROADCAST_CHANNEL,
-		)
-
-		createCrawlEvent(
-			13467065,
-			"-Darius",
-			BROADCAST_CHANNEL,
-		)
-
-		createCrawlEvent(
-			19490974,
-			"the50sten",
-			BROADCAST_CHANNEL,
-		)
+		for _, watcher := range osuWatcher {
+			for _, channel := range watcher.OutputChannel {
+				createCrawlEvent(
+					watcher.UserId,
+					watcher.UserName,
+					channel,
+				)
+			}
+		}
 
 		discordBot.Run()
 	},
