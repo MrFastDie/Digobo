@@ -135,7 +135,7 @@ func (this *Event) createTypeTitle() string {
 	case EVENT_TYPE_RANK:
 		return "Scored a new rank"
 	case EVENT_TYPE_RANK_LOST:
-		return "Lost a rank"
+		return "Lost #1 rank"
 	case EVENT_TYPE_USER_SUPPORT_AGAIN:
 		return "Supports osu! again"
 	case EVENT_TYPE_USER_SUPPORT_FIRST:
