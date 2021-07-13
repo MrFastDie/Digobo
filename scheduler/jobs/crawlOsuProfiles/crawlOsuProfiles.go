@@ -2,20 +2,19 @@ package CrawlOsuProfiles
 
 import (
 	"Digobo/apps/osu"
-	"Digobo/config"
 	"Digobo/database"
 	"Digobo/discordBot"
 	"Digobo/json"
 	"Digobo/log"
 	"Digobo/scheduler"
 	"github.com/bwmarrin/discordgo"
-	"strconv"
 	"time"
 )
 
 type Data struct {
-	UserProfile  int
-	BeatmapTypes osu.BeatmapType
+	UserId        int
+	UserName      string
+	OutputChannel string
 }
 
 type CrawlOsuProfiles struct{}
@@ -23,78 +22,67 @@ type CrawlOsuProfiles struct{}
 func (this *CrawlOsuProfiles) Execute(rawData string) error {
 	var data Data
 
-	if rawData == "" {
-		data.UserProfile = 13467065
-		data.BeatmapTypes = osu.GRAVEYARD | osu.PENDING | osu.RANKED | osu.LOVED
-	} else {
-		json.Unmarshal(rawData, data)
+	err := json.Unmarshal([]byte(rawData), &data)
+	if err != nil {
+		log.Error.Println("Cant unmarshal data for scheduled job", err)
+		return err
 	}
 
-	profileResult := osu.GetUserBeatmaps(data.UserProfile, data.BeatmapTypes)
-	databaseResult, err := database.GetOsuUserBeatmaps(data.UserProfile)
-	if err != nil && err.Error() == "sql: no rows in result set" {
-		err := database.InsertIntoOsuUserBeatmaps(data.UserProfile, data.BeatmapTypes, profileResult)
-		if err != nil {
-			log.Warning.Println(err)
-		}
-	} else if err != nil {
-		log.Warning.Println(err)
-	} else {
-		// TODO only show the really new ones (or deleted)
-		// TODO better comparement len != len is kinda cheap but deepequal wont work
-		if len(profileResult.Graveyard) != len(databaseResult.BeatmapData.Graveyard) {
-			notifyChannel(databaseResult, osu.STRING_GRAVEYARD, profileResult.Graveyard)
+	var osuData osu.UserRecentActivityResult
+
+	recentActivityId, err := database.OsuUserRecentActivityGetLastActivityId(data.UserId)
+	if err != nil && err.Error() != "sql: no rows in result set" {
+		return err
+	}
+
+	osuData, err = osu.GetUserRecentActivity(data.UserId)
+	if err != nil {
+		return err
+	}
+
+	for _, osuDataSet := range osuData {
+		if recentActivityId == osuDataSet.Id {
+			break
 		}
 
-		if len(profileResult.Pending) != len(databaseResult.BeatmapData.Pending) {
-			notifyChannel(databaseResult, osu.STRING_PENDING, profileResult.Pending)
-		}
-
-		if len(profileResult.Ranked) != len(databaseResult.BeatmapData.Ranked) {
-			notifyChannel(databaseResult, osu.STRING_RANKED, profileResult.Ranked)
-		}
-
-		if len(profileResult.Loved) != len(databaseResult.BeatmapData.Loved) {
-			notifyChannel(databaseResult, osu.STRING_LOVED, profileResult.Loved)
-		}
-
-		err := database.UpdateOsuUserBeatmaps(databaseResult.Uuid, databaseResult.BeatmapType, profileResult)
-		if err != nil {
-			log.Warning.Println(err)
+		switch osuDataSet.Type {
+		case osu.EVENT_TYPE_ACHIEVEMENT,
+			osu.EVENT_TYPE_BEATMAP_PLAYCOUNT,
+			osu.EVENT_TYPE_BEATMAPSET_APPROVE,
+			osu.EVENT_TYPE_BEATMAPSET_DELETE,
+			osu.EVENT_TYPE_BEATMAPSET_REVIVE,
+			osu.EVENT_TYPE_BEATMAPSET_UPDATE,
+			osu.EVENT_TYPE_BEATMAPSET_UPLOAD,
+			osu.EVENT_TYPE_RANK,
+			osu.EVENT_TYPE_RANK_LOST:
+			notifyChannel(data.OutputChannel, osuDataSet.PrepareEmbed(data.UserName, data.UserId))
+			break
 		}
 	}
 
-	dataStr, _ := json.Json.Marshal(data)
+	if len(osuData) > 0 {
+		if recentActivityId == 0 {
+			err := database.OsuUserRecentActivityInsertLastActivity(data.UserId, osuData[0].Id)
+			if err != nil {
+				log.Error.Println("can't insert into osu_user_recent_activity", err)
+				return err
+			}
+		} else {
+			err := database.OsuUserRecentActivityUpdateLastActivityId(data.UserId, osuData[0].Id)
+			if err != nil {
+				log.Error.Println("can't update osu_user_recent_activity", err)
+				return err
+			}
+		}
+	}
 
-	CrawlOsuProfilesJobStart(time.Now().Add(2 * time.Hour), string(dataStr))
+	CrawlOsuProfilesJobStart(time.Now().Add(30*time.Minute), rawData)
 
 	return nil
 }
 
-func notifyChannel(dbData database.OsuUserBeatmaps, beatmapType string, data []osu.UserBeatmaps) {
-	var embedData []*discordgo.MessageEmbedField
-
-	for _, beatmap := range data {
-		embedData = append(embedData, &discordgo.MessageEmbedField{
-			Name:   beatmap.Title,
-			Value:  "https://osu.ppy.sh/beatmapsets/" + strconv.Itoa(beatmap.Id),
-			Inline: false,
-		})
-	}
-
-	embed := &discordgo.MessageEmbed{
-		Title:       dbData.UserName,
-		Description: beatmapType + " has changed content",
-		Timestamp:   time.Now().Format(time.RFC3339),
-		Color:       config.Config.Bot.DefaultEmbedColor,
-		Author:      &discordgo.MessageEmbedAuthor{},
-		Fields: embedData,
-	}
-
-	embed.URL = "https://osu.ppy.sh/users/" + strconv.Itoa(dbData.User)
-
-	// TODO send to specific server channel
-	_, err := discordBot.GetInstance().ChannelMessageSendEmbed("863777071113043989", embed)
+func notifyChannel(channelId string, embed *discordgo.MessageEmbed) {
+	_, err := discordBot.GetInstance().ChannelMessageSendEmbed(channelId, embed)
 	if err != nil {
 		log.Warning.Println("couldn't send embed to discord server channel for notify", err)
 	}

@@ -4,11 +4,13 @@ import (
 	"Digobo/config"
 	"Digobo/json"
 	"Digobo/log"
+	"fmt"
 	"net/http"
 	"strconv"
 )
 
 const OSU_API_URL = "https://osu.ppy.sh"
+const USER_RECENT_ACTIVITY_URL = OSU_API_URL + "/api/v2/users/%s/recent_activity"
 
 type BeatmapType int
 
@@ -21,30 +23,25 @@ type UserBeatmapsResult struct {
 	Ranked     []UserBeatmaps
 }
 
-const (
-	FAVORITE    BeatmapType = 1 << iota
-	GRAVEYARD   BeatmapType = 1 << iota
-	LOVED       BeatmapType = 1 << iota
-	MOST_PLAYED BeatmapType = 1 << iota
-	PENDING     BeatmapType = 1 << iota
-	RANKED      BeatmapType = 1 << iota
-)
+type UserRecentActivityResult []Event
 
-const (
-	STRING_FAVORITE = "favorite"
-	STRING_GRAVEYARD = "graveyard"
-	STRING_LOVED = "loved"
-	STRING_MOST_PLAYED = "most_played"
-	STRING_PENDING = "pending"
-	STRING_RANKED = "ranked"
-)
+func GetUserRecentActivity(userId int) (UserRecentActivityResult, error) {
+	var ret UserRecentActivityResult
+	client := &http.Client{}
 
-func prepareRequest(method string, url string) *http.Request {
-	req, _ := http.NewRequest(method, url, nil)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+config.Config.Apps.Osu.Token)
+	res, err := client.Do(prepareRequest("GET", fmt.Sprintf(USER_RECENT_ACTIVITY_URL, strconv.Itoa(userId))))
+	if err != nil {
+		log.Error.Println("can't fetch from osu! api", err)
+		return nil, err
+	}
 
-	return req
+	err = json.Json.NewDecoder(res.Body).Decode(&ret)
+	if err != nil {
+		log.Warning.Println("can't decode osu! api result to event object", err)
+		return nil, err
+	}
+
+	return ret, nil
 }
 
 func GetUserBeatmaps(userId int, beatmapType BeatmapType) UserBeatmapsResult {
@@ -52,26 +49,26 @@ func GetUserBeatmaps(userId int, beatmapType BeatmapType) UserBeatmapsResult {
 
 	client := &http.Client{}
 
-	if FAVORITE&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_FAVORITE + "?limit=2000"))
+	if USER_BEATMAPS_FAVORITE&beatmapType > 0 {
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" +USER_BEATMAPS_STRING_FAVORITE+ "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.Favorite)
 		if err != nil {
-			log.Warning.Println("Cant unmarshal osu FAVORITE", err)
+			log.Warning.Println("Cant unmarshal osu USER_BEATMAPS_FAVORITE", err)
 		}
 	}
 
-	if GRAVEYARD&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_GRAVEYARD + "?limit=2000"))
+	if USER_BEATMAPS_GRAVEYARD&beatmapType > 0 {
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" +USER_BEATMAPS_STRING_GRAVEYARD+ "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.Graveyard)
 		if err != nil {
-			log.Warning.Println("Cant unmarshal osu GRAVEYARD", err)
+			log.Warning.Println("Cant unmarshal osu USER_BEATMAPS_GRAVEYARD", err)
 		}
 	}
 
-	if LOVED&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_LOVED + "?limit=2000"))
+	if USER_BEATMAPS_LOVED&beatmapType > 0 {
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" +USER_BEATMAPS_STRING_LOVED+ "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.Loved)
 		if err != nil {
@@ -79,32 +76,40 @@ func GetUserBeatmaps(userId int, beatmapType BeatmapType) UserBeatmapsResult {
 		}
 	}
 
-	if MOST_PLAYED&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_MOST_PLAYED + "?limit=2000"))
+	if USER_BEATMAPS_MOST_PLAYED&beatmapType > 0 {
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" +USER_BEATMAPS_STRING_MOST_PLAYED+ "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.MostPlayer)
 		if err != nil {
-			log.Warning.Println("Cant unmarshal osu MOST_PLAYED", err)
+			log.Warning.Println("Cant unmarshal osu USER_BEATMAPS_MOST_PLAYED", err)
 		}
 	}
 
-	if PENDING&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_PENDING + "?limit=2000"))
+	if USER_BEATMAPS_PENDING&beatmapType > 0 {
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" +USER_BEATMAPS_STRING_PENDING+ "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.Pending)
 		if err != nil {
-			log.Warning.Println("Cant unmarshal osu PENDING", err)
+			log.Warning.Println("Cant unmarshal osu USER_BEATMAPS_PENDING", err)
 		}
 	}
 
-	if RANKED&beatmapType > 0 {
-		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" + STRING_RANKED + "?limit=2000"))
+	if USER_BEATMAPS_RANKED&beatmapType > 0 {
+		res, _ := client.Do(prepareRequest("GET", OSU_API_URL+"/api/v2/users/"+strconv.Itoa(userId)+"/beatmapsets/" +USER_BEATMAPS_STRING_RANKED+ "?limit=2000"))
 
 		err := json.Json.NewDecoder(res.Body).Decode(&ret.Ranked)
 		if err != nil {
-			log.Warning.Println("Cant unmarshal osu RANKED", err)
+			log.Warning.Println("Cant unmarshal osu USER_BEATMAPS_RANKED", err)
 		}
 	}
 
 	return ret
+}
+
+func prepareRequest(method string, url string) *http.Request {
+	req, _ := http.NewRequest(method, url, nil)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+config.Config.Apps.Osu.Token)
+
+	return req
 }

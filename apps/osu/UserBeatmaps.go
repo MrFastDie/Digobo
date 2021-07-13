@@ -2,6 +2,24 @@ package osu
 
 import "time"
 
+const (
+	USER_BEATMAPS_FAVORITE    BeatmapType = 1 << iota
+	USER_BEATMAPS_GRAVEYARD   BeatmapType = 1 << iota
+	USER_BEATMAPS_LOVED       BeatmapType = 1 << iota
+	USER_BEATMAPS_MOST_PLAYED BeatmapType = 1 << iota
+	USER_BEATMAPS_PENDING     BeatmapType = 1 << iota
+	USER_BEATMAPS_RANKED      BeatmapType = 1 << iota
+)
+
+const (
+	USER_BEATMAPS_STRING_FAVORITE    = "favorite"
+	USER_BEATMAPS_STRING_GRAVEYARD   = "graveyard"
+	USER_BEATMAPS_STRING_LOVED       = "loved"
+	USER_BEATMAPS_STRING_MOST_PLAYED = "most_played"
+	USER_BEATMAPS_STRING_PENDING     = "pending"
+	USER_BEATMAPS_STRING_RANKED      = "ranked"
+)
+
 type UserBeatmaps struct {
 	Artist        string `json:"artist"`
 	ArtistUnicode string `json:"artist_unicode"`
