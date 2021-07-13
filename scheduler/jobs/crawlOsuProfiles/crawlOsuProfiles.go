@@ -14,7 +14,7 @@ import (
 type Data struct {
 	UserId        int
 	UserName      string
-	OutputChannel string
+	OutputChannel []string
 }
 
 type CrawlOsuProfiles struct{}
@@ -26,6 +26,17 @@ func (this *CrawlOsuProfiles) Execute(rawData string) error {
 	if err != nil {
 		log.Error.Println("Cant unmarshal data for scheduled job", err)
 		return err
+	}
+
+	osuUserDbData, err := database.GetOsuWatcher(data.UserId)
+	if err != nil {
+		log.Error.Println("can't fetch osu! DB user!", err)
+		return err
+	}
+
+	data.OutputChannel = osuUserDbData.OutputChannel
+	if len(data.OutputChannel) == 0 {
+		return nil
 	}
 
 	var osuData osu.UserRecentActivityResult
@@ -63,7 +74,9 @@ func (this *CrawlOsuProfiles) Execute(rawData string) error {
 	}
 
 	for i := len(notifyData)-1; i >= 0; i-- {
-		notifyChannel(data.OutputChannel, notifyData[i])
+		for _, channel := range data.OutputChannel {
+			notifyChannel(channel, notifyData[i])
+		}
 	}
 
 	if len(osuData) > 0 {

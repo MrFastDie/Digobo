@@ -14,6 +14,7 @@ import (
 const OSU_API_URL = "https://osu.ppy.sh"
 const OSU_TOKEN_URL = "/oauth/token"
 const USER_RECENT_ACTIVITY_URL = OSU_API_URL + "/api/v2/users/%s/recent_activity"
+const USER_PROFILE_URL = "/api/v2/users/%d"
 
 type BeatmapType int
 
@@ -92,6 +93,27 @@ func GetUserRecentActivity(userId int) (UserRecentActivityResult, error) {
 	if err != nil {
 		log.Warning.Println("can't decode osu! api result to event object", err)
 		return nil, err
+	}
+
+	return ret, nil
+}
+
+func GetUser(userId int) (UserProfile, error) {
+	var ret UserProfile
+	client := &http.Client{}
+
+	req := prepareRequest("GET", fmt.Sprintf(OSU_API_URL + USER_PROFILE_URL, userId), getToken())
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Error.Println("can't fetch user info from osu!", err)
+		return UserProfile{}, err
+	}
+
+	err = json.Json.NewDecoder(res.Body).Decode(&ret)
+	if err != nil {
+		log.Error.Println("can't unmarshal osu! user api data to model", err)
+		return UserProfile{}, err
 	}
 
 	return ret, nil

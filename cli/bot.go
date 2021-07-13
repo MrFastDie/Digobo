@@ -12,6 +12,7 @@ import (
 
 	// load commands when we use the bot
 	_ "Digobo/discordBot/command/commands/help"
+	_ "Digobo/discordBot/command/commands/osuUserWatcher"
 	_ "Digobo/discordBot/command/commands/ping"
 	_ "Digobo/discordBot/command/commands/randomGayLinkAnswer"
 
@@ -28,18 +29,18 @@ var serveCmd = &cobra.Command{
 
 		crawlReminderEvents.CrawlReminderEventJobStart(time.Now(), "")
 
-		osuWatcher, err := database.GetOsuWatcher()
+		osuWatcher, err := database.GetOsuWatchers()
 		if err != nil {
 			log.Error.Fatal("can't fetch osu watcher", err)
 			return
 		}
 
 		for _, watcher := range osuWatcher {
-			for _, channel := range watcher.OutputChannel {
+			if len(watcher.OutputChannel) > 0 {
 				createCrawlEvent(
 					watcher.UserId,
 					watcher.UserName,
-					channel,
+					watcher.OutputChannel,
 				)
 			}
 		}
@@ -48,7 +49,7 @@ var serveCmd = &cobra.Command{
 	},
 }
 
-func createCrawlEvent(userId int, userName string, outputChannel string) {
+func createCrawlEvent(userId int, userName string, outputChannel []string) {
 	CrawlerData := CrawlOsuProfiles.Data{
 		UserId:        userId,
 		UserName:      userName,

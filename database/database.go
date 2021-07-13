@@ -17,6 +17,9 @@ func Init() {
 	db, _ = connect()
 }
 
+const NO_ROWS = "sql: no rows in result set"
+const PQ_DUPLICATES = "pq: duplicate key value violates unique constraint"
+
 func TestDatabase() error {
 	_, err := connect()
 
