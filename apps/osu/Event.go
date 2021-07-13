@@ -225,7 +225,7 @@ func (this *Event) createMessageEmbedFields() []*discordgo.MessageEmbedField {
 	case EVENT_TYPE_RANK:
 		ret = append(ret, &discordgo.MessageEmbedField{
 			Name:   "scored a new rank (Rank: #" + strconv.Itoa(this.Rank) + ", ScoreRank: " + this.ScoreRank + ")",
-			Value:  OSU_API_URL + this.Beatmap.Url,
+			Value:  "on: " + this.Beatmap.Title + "\n" + OSU_API_URL + this.Beatmap.Url,
 			Inline: false,
 		})
 		break
