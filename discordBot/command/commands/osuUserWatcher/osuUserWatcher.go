@@ -7,6 +7,7 @@ import (
 	"Digobo/log"
 	CrawlOsuProfiles "Digobo/scheduler/jobs/crawlOsuProfiles"
 	"encoding/json"
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"strconv"
 	"strings"
@@ -20,11 +21,17 @@ func (this *OsuUserWatcher) Name() string {
 }
 
 func (this *OsuUserWatcher) Title() string {
-	return "Adds or remove a user from the watch list"
+	return "add <osu_user_id> - Adds a user to the watch list\n" +
+		"remote <osu_user_id> - Removes a user from the watch list\n" +
+		"color <osu_user_id> <color_hex_code> - Changes the color of the message embed\n" +
+		"list - List all members of the watch list"
 }
 
 func (this *OsuUserWatcher) Description() string {
-	return "OsuUserWatcher add/remove <osu_user_id> (adds or removes a user to the watch list of this channel)"
+	return "add <osu_user_id> - Adds a user to the watch list\n" +
+		"remote <osu_user_id> - Removes a user from the watch list\n" +
+		"color <osu_user_id> <color_hex_code> - Changes the color of the message embed\n" +
+		"list - List all members of the watch list"
 }
 
 func (this *OsuUserWatcher) Hidden() bool {
@@ -44,7 +51,8 @@ func (this *OsuUserWatcher) Execute(args string, s *discordgo.Session, m *discor
 
 	parts := strings.SplitN(args, " ", 2)
 
-	if parts[0] == "add" {
+	switch parts[0] {
+	case "add":
 		userAlreadyPresent := true
 		userId, err := strconv.Atoi(parts[1])
 		if err != nil {
@@ -87,18 +95,23 @@ func (this *OsuUserWatcher) Execute(args string, s *discordgo.Session, m *discor
 
 		if !userAlreadyPresent {
 			CrawlerData := CrawlOsuProfiles.Data{
-				UserId:        userId,
-				UserName:      user.UserName,
-				OutputChannel: []string{m.ChannelID},
+				UserId:   userId,
+				UserName: user.UserName,
+				OutputChannel: []database.OsuOutputChannel{
+					{
+						ChannelId: m.ChannelID,
+					},
+				},
 			}
 			CrawlStrData, _ := json.Marshal(CrawlerData)
 			CrawlOsuProfiles.CrawlOsuProfilesJobStart(time.Now(), string(CrawlStrData))
 		}
 
 		sendChannelMessage(user.UserName+" has been added to this channel", s, m)
-	}
 
-	if parts[0] == "remove" {
+		break
+
+	case "remove":
 		userId, err := strconv.Atoi(parts[1])
 		if err != nil {
 			sendChannelMessage("Please provide a valid user_id", s, m)
@@ -112,6 +125,54 @@ func (this *OsuUserWatcher) Execute(args string, s *discordgo.Session, m *discor
 		}
 
 		sendChannelMessage("Removal has been successful", s, m)
+
+		break
+
+	case "color":
+		colorParts := strings.SplitN(parts[1], " ", 2)
+
+		userId, err := strconv.Atoi(colorParts[0])
+		if err != nil {
+			sendChannelMessage("Please provide a valid user_id", s, m)
+		}
+
+		user, err := database.GetOsuWatcher(userId)
+		if err != nil || !hasChannel(m.ChannelID, user.OutputChannel) {
+			sendChannelMessage("User is not registered on watch list", s, m)
+			return err
+		}
+
+		color, err := strconv.ParseInt(colorParts[1], 16, 64)
+		if err != nil {
+			sendChannelMessage("Please provide a valid hex number as color", s, m)
+			return err
+		}
+
+		err = database.AddOsuWatcherColor(userId, m.ChannelID, int(color))
+		if err != nil {
+			sendChannelMessage("An error occured! Please try again later", s, m)
+			return err
+		}
+
+		sendChannelMessage("Color has been added!", s, m)
+
+		break
+
+	case "list":
+		list, err := database.GetOsuWatcherListByChannel(m.ChannelID)
+		if err != nil && err.Error() == database.NO_ROWS {
+			sendChannelMessage("There are currently no member in your watch list", s, m)
+			return nil
+		} else if err != nil {
+			log.Error.Println("can't fetch osu watcher list", err)
+			return err
+		}
+
+		for _, entry := range list {
+			sendChannelMessage(fmt.Sprintf("%s with ID: %d (%s/users/%d)", entry.UserName, entry.UserId, osu.OSU_API_URL, entry.UserId), s, m)
+		}
+
+		break
 	}
 
 	return nil
@@ -122,6 +183,15 @@ func sendChannelMessage(msg string, s *discordgo.Session, m *discordgo.MessageCr
 	if err != nil {
 		log.Error.Println("can't send channel message", err)
 	}
+}
+
+func hasChannel(channelId string, channelList []database.OsuOutputChannel) bool {
+	for _, b := range channelList {
+		if b.ChannelId == channelId {
+			return true
+		}
+	}
+	return false
 }
 
 func init() {

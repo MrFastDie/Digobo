@@ -14,7 +14,7 @@ import (
 type Data struct {
 	UserId        int
 	UserName      string
-	OutputChannel []string
+	OutputChannel []database.OsuOutputChannel
 }
 
 type CrawlOsuProfiles struct{}
@@ -75,7 +75,7 @@ func (this *CrawlOsuProfiles) Execute(rawData string) error {
 
 	for i := len(notifyData)-1; i >= 0; i-- {
 		for _, channel := range data.OutputChannel {
-			notifyChannel(channel, notifyData[i])
+			notifyChannel(channel.ChannelId, notifyData[i], channel.Color)
 		}
 	}
 
@@ -100,7 +100,11 @@ func (this *CrawlOsuProfiles) Execute(rawData string) error {
 	return nil
 }
 
-func notifyChannel(channelId string, embed *discordgo.MessageEmbed) {
+func notifyChannel(channelId string, embed *discordgo.MessageEmbed, color *int) {
+	if color != nil {
+		embed.Color = *color
+	}
+
 	_, err := discordBot.GetInstance().ChannelMessageSendEmbed(channelId, embed)
 	if err != nil {
 		log.Warning.Println("couldn't send embed to discord server channel for notify", err)

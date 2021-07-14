@@ -49,7 +49,7 @@ var serveCmd = &cobra.Command{
 	},
 }
 
-func createCrawlEvent(userId int, userName string, outputChannel []string) {
+func createCrawlEvent(userId int, userName string, outputChannel []database.OsuOutputChannel) {
 	CrawlerData := CrawlOsuProfiles.Data{
 		UserId:        userId,
 		UserName:      userName,
