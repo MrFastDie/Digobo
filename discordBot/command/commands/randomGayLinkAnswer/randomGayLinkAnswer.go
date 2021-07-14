@@ -66,6 +66,24 @@ func (this *RandomGayLinkAnswer) Execute(args string, s *discordgo.Session, m *d
 
 			link = fmt.Sprintf("Link %s successfully deleted", parts[1])
 		}
+
+		_, err = s.ChannelMessageSend(m.ChannelID, link)
+		if err != nil {
+			log.Error.Println("can't send embed", err)
+			return err
+		}
+
+		return nil
+	}
+
+	channel, err := s.Channel(m.ChannelID)
+	if err != nil {
+		log.Error.Println("can't fetch channel", err)
+		return err
+	}
+
+	if !channel.NSFW {
+		return nil
 	}
 
 	_, err = s.ChannelMessageSend(m.ChannelID, link)
