@@ -1,0 +1,33 @@
+package osu
+
+import "time"
+
+type ScoreBeatmap struct {
+	BeatmapsetId     int         `json:"beatmapset_id"`
+	DifficultyRating float64     `json:"difficulty_rating"`
+	Id               int         `json:"id"`
+	Mode             string      `json:"mode"`
+	Status           string      `json:"status"`
+	TotalLength      int         `json:"total_length"`
+	UserId           int         `json:"user_id"`
+	Version          string      `json:"version"`
+	Accuracy         float64     `json:"accuracy"`
+	Ar               float64     `json:"ar"`
+	Bpm              float64     `json:"bpm"`
+	Convert          bool        `json:"convert"`
+	CountCircles     int         `json:"count_circles"`
+	CountSliders     int         `json:"count_sliders"`
+	CountSpinners    int         `json:"count_spinners"`
+	Cs               float64     `json:"cs"`
+	DeletedAt        interface{} `json:"deleted_at"`
+	Drain            float64     `json:"drain"`
+	HitLength        int         `json:"hit_length"`
+	IsScoreable      bool        `json:"is_scoreable"`
+	LastUpdated      time.Time   `json:"last_updated"`
+	ModeInt          int         `json:"mode_int"`
+	Passcount        int         `json:"passcount"`
+	Playcount        int         `json:"playcount"`
+	Ranked           int         `json:"ranked"`
+	Url              string      `json:"url"`
+	Checksum         string      `json:"checksum"`
+}

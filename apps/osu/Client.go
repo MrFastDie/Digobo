@@ -15,6 +15,7 @@ const OSU_API_URL = "https://osu.ppy.sh"
 const OSU_TOKEN_URL = "/oauth/token"
 const USER_RECENT_ACTIVITY_URL = OSU_API_URL + "/api/v2/users/%s/recent_activity"
 const USER_PROFILE_URL = "/api/v2/users/%d"
+const SCORE_URL = "/api/v2/users/%d/scores/%s?mode=%s&limit=%d&offset=%d"
 
 type BeatmapType int
 
@@ -120,10 +121,41 @@ func GetUser(userId int) (UserProfile, error) {
 	return ret, nil
 }
 
+func GetScores(userId int, scoreType ScoreType, scoreMode ScoreMode, limit int, offset int) ([]Score, error) {
+	var ret []Score
+
+	req := prepareRequest("GET", fmt.Sprintf(OSU_API_URL + SCORE_URL, userId, scoreType, scoreMode, limit, offset), getToken())
+	err := requestToModel(req, &ret)
+	if err != nil {
+		return nil, err
+	}
+
+	return ret, nil
+}
+
 func prepareRequest(method string, url string, token string) *http.Request {
 	req, _ := http.NewRequest(method, url, nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer " + token)
 
 	return req
+}
+
+func requestToModel(req *http.Request, model interface{}) error {
+	client := &http.Client{}
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Error.Println("can't do osu! request", err)
+		return err
+	}
+
+	err = json.Json.NewDecoder(res.Body).Decode(model)
+	if err != nil {
+		// TODO check if key might be invalid
+		log.Error.Println("can't unmarshal to requested model", err)
+		return err
+	}
+
+	return nil
 }
