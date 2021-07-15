@@ -79,3 +79,25 @@ func Run() {
 	// Cleanly close down the Discord session.
 	Close()
 }
+
+func SendMessage(msg string, channelId string, s *discordgo.Session) error {
+	_, err := s.ChannelMessageSend(channelId, msg)
+	if err != nil {
+		log.Error.Println("can't send channel message", err)
+
+		return err
+	}
+
+	return nil
+}
+
+func SendEmbed(embed *discordgo.MessageEmbed, channelId string, s *discordgo.Session) error {
+	_, err := s.ChannelMessageSendEmbed(channelId, embed)
+	if err != nil {
+		log.Error.Println("can't send embed", err)
+
+		return err
+	}
+
+	return nil
+}
