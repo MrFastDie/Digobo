@@ -46,54 +46,11 @@ type OAuthToken struct {
 
 var token OAuthToken
 
-func getToken() string {
-	// TODO validate token func if a result cant be parsed
-	if token.TokenType == "" || token.ExpiresAt.Sub(time.Now()) <= 0 {
-		tokenReq := OAuthTokenRequest{
-			ClientId: config.Config.Apps.Osu.ClientId,
-			ClientSecret: config.Config.Apps.Osu.ClientSecret,
-			GrantType: "client_credentials",
-			Scope: "public",
-		}
-
-		tokenReqStr, _ := json.Json.Marshal(tokenReq)
-
-		req, _ := http.NewRequest("POST", OSU_API_URL + OSU_TOKEN_URL, bytes.NewBuffer(tokenReqStr))
-		req.Header.Set("Content-Type", "application/json")
-
-		client := &http.Client{}
-
-		res, err := client.Do(req)
-		if err != nil {
-			log.Error.Println("can't fetch new token for osu!", err)
-			return ""
-		}
-
-		err = json.Json.NewDecoder(res.Body).Decode(&token)
-		if err != nil {
-			log.Error.Println("can't unmarshal token for osu!", err)
-			return ""
-		}
-
-		token.ExpiresAt = time.Now().Add(time.Duration(token.ExpiresIn) * time.Second)
-	}
-
-	return token.AccessToken
-}
-
 func GetUserRecentActivity(userId int) (UserRecentActivityResult, error) {
 	var ret UserRecentActivityResult
-	client := &http.Client{}
 
-	res, err := client.Do(prepareRequest("GET", fmt.Sprintf(USER_RECENT_ACTIVITY_URL, strconv.Itoa(userId)), getToken()))
+	err := requestToModel(prepareRequest("GET", fmt.Sprintf(USER_RECENT_ACTIVITY_URL, strconv.Itoa(userId)), getToken()), &ret)
 	if err != nil {
-		log.Error.Println("can't fetch from osu! api", err)
-		return nil, err
-	}
-
-	err = json.Json.NewDecoder(res.Body).Decode(&ret)
-	if err != nil {
-		log.Warning.Println("can't decode osu! api result to event object", err)
 		return nil, err
 	}
 
@@ -102,19 +59,9 @@ func GetUserRecentActivity(userId int) (UserRecentActivityResult, error) {
 
 func GetUser(userId int) (UserProfile, error) {
 	var ret UserProfile
-	client := &http.Client{}
 
-	req := prepareRequest("GET", fmt.Sprintf(OSU_API_URL + USER_PROFILE_URL, userId), getToken())
-
-	res, err := client.Do(req)
+	err := requestToModel(prepareRequest("GET", fmt.Sprintf(OSU_API_URL + USER_PROFILE_URL, userId), getToken()), &ret)
 	if err != nil {
-		log.Error.Println("can't fetch user info from osu!", err)
-		return UserProfile{}, err
-	}
-
-	err = json.Json.NewDecoder(res.Body).Decode(&ret)
-	if err != nil {
-		log.Error.Println("can't unmarshal osu! user api data to model", err)
 		return UserProfile{}, err
 	}
 
@@ -152,10 +99,58 @@ func requestToModel(req *http.Request, model interface{}) error {
 
 	err = json.Json.NewDecoder(res.Body).Decode(model)
 	if err != nil {
-		// TODO check if key might be invalid
-		log.Error.Println("can't unmarshal to requested model", err)
-		return err
+		var errStruct struct {
+			Authentication string `json:"authentication"`
+		}
+		newErr := json.Json.NewDecoder(res.Body).Decode(errStruct)
+		if newErr != nil {
+			log.Error.Println("can't unmarshal to requested model", err)
+			return err
+		}
+
+		// Token was invalid, generating new one
+		generateToken()
+
+		return nil
 	}
 
 	return nil
+}
+
+func getToken() string {
+	if token.TokenType == "" || token.ExpiresAt.Sub(time.Now()) <= 0 {
+		generateToken()
+	}
+
+	return token.AccessToken
+}
+
+func generateToken() {
+	tokenReq := OAuthTokenRequest{
+		ClientId: config.Config.Apps.Osu.ClientId,
+		ClientSecret: config.Config.Apps.Osu.ClientSecret,
+		GrantType: "client_credentials",
+		Scope: "public",
+	}
+
+	tokenReqStr, _ := json.Json.Marshal(tokenReq)
+
+	req, _ := http.NewRequest("POST", OSU_API_URL + OSU_TOKEN_URL, bytes.NewBuffer(tokenReqStr))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Error.Println("can't fetch new token for osu!", err)
+		return
+	}
+
+	err = json.Json.NewDecoder(res.Body).Decode(&token)
+	if err != nil {
+		log.Error.Println("can't unmarshal token for osu!", err)
+		return
+	}
+
+	token.ExpiresAt = time.Now().Add(time.Duration(token.ExpiresIn) * time.Second)
 }
