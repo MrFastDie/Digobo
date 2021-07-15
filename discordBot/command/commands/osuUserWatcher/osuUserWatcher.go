@@ -2,7 +2,9 @@ package osuUserWatcher
 
 import (
 	"Digobo/apps/osu"
+	"Digobo/config"
 	"Digobo/database"
+	"Digobo/discordBot"
 	"Digobo/discordBot/command"
 	"Digobo/log"
 	CrawlOsuProfiles "Digobo/scheduler/jobs/crawlOsuProfiles"
@@ -56,7 +58,8 @@ func (this *OsuUserWatcher) Execute(args string, s *discordgo.Session, m *discor
 		userAlreadyPresent := true
 		userId, err := strconv.Atoi(parts[1])
 		if err != nil {
-			sendChannelMessage("Please provide a valid user_id", s, m)
+			discordBot.SendMessage("Please provide a valid user_id", m.ChannelID, s)
+			return err
 		}
 
 		user, err := database.GetOsuWatcher(userId)
@@ -64,14 +67,14 @@ func (this *OsuUserWatcher) Execute(args string, s *discordgo.Session, m *discor
 			osuUser, err := osu.GetUser(userId)
 			if err != nil {
 				log.Info.Println("can't fetch osu! user from API")
-				sendChannelMessage("No user found with provided user_id", s, m)
+				discordBot.SendMessage("No user found with provided user_id", m.ChannelID, s)
 				return err
 			}
 
 			err = database.AddOsuWatcherUser(userId, osuUser.Username)
 			if err != nil {
 				log.Error.Println("can't add osu! user to DB", err)
-				sendChannelMessage("An error occurred, please try again later", s, m)
+				discordBot.SendMessage("An error occurred, please try again later", m.ChannelID, s)
 				return err
 			}
 
@@ -79,17 +82,17 @@ func (this *OsuUserWatcher) Execute(args string, s *discordgo.Session, m *discor
 			user, _ = database.GetOsuWatcher(userId)
 		} else if err != nil {
 			log.Error.Println("can't fetch osu! user from db", err)
-			sendChannelMessage("An error occurred, please try again later", s, m)
+			discordBot.SendMessage("An error occurred, please try again later", m.ChannelID, s)
 			return err
 		}
 
 		err = database.AddOsuWatcherOutputChannel(userId, m.ChannelID)
 		if err != nil && strings.Contains(err.Error(), database.PQ_DUPLICATES) {
-			sendChannelMessage("User has already been added", s, m)
+			discordBot.SendMessage("User has already been added", m.ChannelID, s)
 			return nil
 		} else if err != nil {
 			log.Error.Println("can't add channel to osu! user in db", err)
-			sendChannelMessage("An error occurred, please try again later", s, m)
+			discordBot.SendMessage("An error occurred, please try again later", m.ChannelID, s)
 			return err
 		}
 
@@ -107,24 +110,25 @@ func (this *OsuUserWatcher) Execute(args string, s *discordgo.Session, m *discor
 			CrawlOsuProfiles.CrawlOsuProfilesJobStart(time.Now(), string(CrawlStrData))
 		}
 
-		sendChannelMessage(user.UserName+" has been added to this channel", s, m)
+		discordBot.SendMessage(user.UserName+" has been added to this channel", m.ChannelID, s)
 
 		break
 
 	case "remove":
 		userId, err := strconv.Atoi(parts[1])
 		if err != nil {
-			sendChannelMessage("Please provide a valid user_id", s, m)
+			discordBot.SendMessage("Please provide a valid user_id", m.ChannelID, s)
+			return err
 		}
 
 		err = database.RemoveOsuWatcherOutputChannel(userId, m.ChannelID)
 		if err != nil {
 			log.Error.Println("cant delete output channel from DB", err)
-			sendChannelMessage("An error occurred, please try again later", s, m)
+			discordBot.SendMessage("An error occurred, please try again later", m.ChannelID, s)
 			return err
 		}
 
-		sendChannelMessage("Removal has been successful", s, m)
+		discordBot.SendMessage("Removal has been successful", m.ChannelID, s)
 
 		break
 
@@ -133,56 +137,68 @@ func (this *OsuUserWatcher) Execute(args string, s *discordgo.Session, m *discor
 
 		userId, err := strconv.Atoi(colorParts[0])
 		if err != nil {
-			sendChannelMessage("Please provide a valid user_id", s, m)
+			discordBot.SendMessage("Please provide a valid user_id", m.ChannelID, s)
 		}
 
 		user, err := database.GetOsuWatcher(userId)
 		if err != nil || !hasChannel(m.ChannelID, user.OutputChannel) {
-			sendChannelMessage("User is not registered on watch list", s, m)
+			discordBot.SendMessage("User is not registered on watch list", m.ChannelID, s)
 			return err
 		}
 
 		color, err := strconv.ParseInt(colorParts[1], 16, 64)
 		if err != nil {
-			sendChannelMessage("Please provide a valid hex number as color", s, m)
+			discordBot.SendMessage("Please provide a valid hex number as color", m.ChannelID, s)
 			return err
 		}
 
 		err = database.AddOsuWatcherColor(userId, m.ChannelID, int(color))
 		if err != nil {
-			sendChannelMessage("An error occured! Please try again later", s, m)
+			discordBot.SendMessage("An error occured! Please try again later", m.ChannelID, s)
 			return err
 		}
 
-		sendChannelMessage("Color has been added!", s, m)
+		discordBot.SendMessage("Color has been added!", m.ChannelID, s)
 
 		break
 
 	case "list":
 		list, err := database.GetOsuWatcherListByChannel(m.ChannelID)
 		if err != nil && err.Error() == database.NO_ROWS {
-			sendChannelMessage("There are currently no member in your watch list", s, m)
+			discordBot.SendMessage("There are currently no member in your watch list", m.ChannelID, s)
 			return nil
 		} else if err != nil {
 			log.Error.Println("can't fetch osu watcher list", err)
 			return err
 		}
 
+		var fields []*discordgo.MessageEmbedField
+
 		for _, entry := range list {
-			sendChannelMessage(fmt.Sprintf("%s with ID: %d (%s/users/%d)", entry.UserName, entry.UserId, osu.OSU_API_URL, entry.UserId), s, m)
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   fmt.Sprintf("%s (%d)", entry.UserName, entry.UserId),
+				Value:  fmt.Sprintf("%s/users/%d", osu.OSU_API_URL, entry.UserId),
+				Inline: false,
+			})
+		}
+
+		embed := &discordgo.MessageEmbed{
+			Title:       "osu! watcher list",
+			Description: "Here is everyone currently listed by this channel",
+			Timestamp:   time.Now().Format(time.RFC3339),
+			Color:       config.Config.Bot.DefaultEmbedColor,
+			Fields:      fields,
+		}
+
+		err = discordBot.SendEmbed(embed, m.ChannelID, s)
+		if err != nil {
+			return err
 		}
 
 		break
 	}
 
 	return nil
-}
-
-func sendChannelMessage(msg string, s *discordgo.Session, m *discordgo.MessageCreate) {
-	_, err := s.ChannelMessageSend(m.ChannelID, msg)
-	if err != nil {
-		log.Error.Println("can't send channel message", err)
-	}
 }
 
 func hasChannel(channelId string, channelList []database.OsuOutputChannel) bool {

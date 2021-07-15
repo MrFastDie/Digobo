@@ -46,6 +46,7 @@ type OAuthToken struct {
 var token OAuthToken
 
 func getToken() string {
+	// TODO validate token func if a result cant be parsed
 	if token.TokenType == "" || token.ExpiresAt.Sub(time.Now()) <= 0 {
 		tokenReq := OAuthTokenRequest{
 			ClientId: config.Config.Apps.Osu.ClientId,
