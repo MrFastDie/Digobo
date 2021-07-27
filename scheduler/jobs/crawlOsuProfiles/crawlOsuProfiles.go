@@ -109,6 +109,17 @@ func (this *CrawlOsuProfiles) Execute(rawData string) error {
 		}
 	}
 
+	if data.Retries != 0 {
+		retryData := Data{
+			UserId:        data.UserId,
+			UserName:      data.UserName,
+			Retries:       0,
+			OutputChannel: data.OutputChannel,
+		}
+		rawDataB, _ := json.Json.Marshal(retryData)
+		rawData = string(rawDataB)
+	}
+
 	CrawlOsuProfilesJobStart(time.Now().Add(5*time.Minute), rawData)
 
 	return nil
