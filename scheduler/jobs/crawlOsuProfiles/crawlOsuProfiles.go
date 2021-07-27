@@ -14,6 +14,7 @@ import (
 type Data struct {
 	UserId        int
 	UserName      string
+	Retries       int
 	OutputChannel []database.OsuOutputChannel
 }
 
@@ -48,6 +49,19 @@ func (this *CrawlOsuProfiles) Execute(rawData string) error {
 
 	osuData, err = osu.GetUserRecentActivity(data.UserId)
 	if err != nil {
+		retryData := Data{
+			UserId:        data.UserId,
+			UserName:      data.UserName,
+			Retries:       data.Retries + 1,
+			OutputChannel: data.OutputChannel,
+		}
+		rawData, _ := json.Json.Marshal(retryData)
+		CrawlOsuProfilesJobStart(time.Now().Add(5*time.Minute), string(rawData))
+
+		if data.Retries < 5 {
+			return nil
+		}
+
 		return err
 	}
 
@@ -73,7 +87,7 @@ func (this *CrawlOsuProfiles) Execute(rawData string) error {
 		}
 	}
 
-	for i := len(notifyData)-1; i >= 0; i-- {
+	for i := len(notifyData) - 1; i >= 0; i-- {
 		for _, channel := range data.OutputChannel {
 			notifyChannel(channel.ChannelId, notifyData[i], channel.Color)
 		}

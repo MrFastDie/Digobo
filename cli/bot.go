@@ -53,6 +53,7 @@ func createCrawlEvent(userId int, userName string, outputChannel []database.OsuO
 	CrawlerData := CrawlOsuProfiles.Data{
 		UserId:        userId,
 		UserName:      userName,
+		Retries:       0,
 		OutputChannel: outputChannel,
 	}
 	CrawlStrData, _ := json.Marshal(CrawlerData)

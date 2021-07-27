@@ -100,6 +100,7 @@ func (this *OsuUserWatcher) Execute(args string, s *discordgo.Session, m *discor
 			CrawlerData := CrawlOsuProfiles.Data{
 				UserId:   userId,
 				UserName: user.UserName,
+				Retries:  0,
 				OutputChannel: []database.OsuOutputChannel{
 					{
 						ChannelId: m.ChannelID,
