@@ -4,67 +4,38 @@ import (
 	"Digobo/database"
 	"Digobo/discordBot/command"
 	"Digobo/log"
-	"fmt"
 	"github.com/bwmarrin/discordgo"
-	"strings"
+	"github.com/spf13/cobra"
 )
 
-type RandomGayLinkAnswer struct{}
+var randomGayLinkAnswer = &cobra.Command{
+	Use:   "\U0001F970",
+	Short: "Provides a link to a gay porn",
+	Long:  "This command provides you a link to a gay porn video",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		s := cmd.Context().Value("s").(*discordgo.Session)
+		m := cmd.Context().Value("m").(*discordgo.MessageCreate)
 
-func (this *RandomGayLinkAnswer) Name() string {
-	return "\U0001F970"
-}
-
-func (this *RandomGayLinkAnswer) Title() string {
-	return "Random gay porn link"
-}
-
-func (this *RandomGayLinkAnswer) Description() string {
-	return "Returns a random gay porn link (include a + or - with a following link to add or delete it in the database)"
-}
-
-func (this *RandomGayLinkAnswer) Hidden() bool {
-	return true
-}
-
-func (this *RandomGayLinkAnswer) HasInteractions() bool {
-	return false
-}
-
-func (this *RandomGayLinkAnswer) Execute(args string, s *discordgo.Session, m *discordgo.MessageCreate) error {
-	// Ignore all messages created by the bot itself
-	// This isn't required in this specific example but it's a good practice.
-	if m.Author.ID == s.State.User.ID {
-		return nil
-	}
-
-	link, err := database.GetKeyValuePairByCommand(this.Name())
-	if err != nil {
-		log.Error.Println("cant fetch a random gay link from DB", err)
-		return err
-	}
-
-	if args != "" && command.IsBotMaster(m.Author.ID) {
-		parts := strings.SplitN(args, " ", 2)
-
-		if parts[0] == "+" {
-			err := database.AddKeyValuePairByCommand(this.Name(), parts[1], m.Author.ID)
-			if err != nil {
-				log.Error.Println("cant add random gay link to DB", err)
-				return err
-			}
-
-			link = fmt.Sprintf("Link %s successfully added", parts[1])
+		// Ignore all messages created by the bot itself
+		// This isn't required in this specific example but it's a good practice.
+		if m.Author.ID == s.State.User.ID {
+			return nil
 		}
 
-		if parts[0] == "-" {
-			err := database.RemoveKeyValuePairByCommandAndValue(this.Name(), parts[1])
-			if err != nil {
-				log.Error.Println("cant delete random gay link from DB", err)
-				return err
-			}
+		link, err := database.GetKeyValuePairByCommand(cmd.Use)
+		if err != nil {
+			log.Error.Println("cant fetch a random gay link from DB", err)
+			return err
+		}
 
-			link = fmt.Sprintf("Link %s successfully deleted", parts[1])
+		channel, err := s.Channel(m.ChannelID)
+		if err != nil {
+			log.Error.Println("can't fetch channel", err)
+			return err
+		}
+
+		if !channel.NSFW {
+			return nil
 		}
 
 		_, err = s.ChannelMessageSend(m.ChannelID, link)
@@ -73,29 +44,13 @@ func (this *RandomGayLinkAnswer) Execute(args string, s *discordgo.Session, m *d
 			return err
 		}
 
+
 		return nil
-	}
-
-	channel, err := s.Channel(m.ChannelID)
-	if err != nil {
-		log.Error.Println("can't fetch channel", err)
-		return err
-	}
-
-	if !channel.NSFW {
-		return nil
-	}
-
-	_, err = s.ChannelMessageSend(m.ChannelID, link)
-	if err != nil {
-		log.Error.Println("can't send embed", err)
-		return err
-	}
-
-
-	return nil
+	},
 }
 
 func init() {
-	command.Commands.LoadCommand(&RandomGayLinkAnswer{})
+	randomGayLinkAnswer.AddCommand(addRandomGayLinkAnswer)
+	randomGayLinkAnswer.AddCommand(removeRandomGayLinkAnswer)
+	command.RootCommand.AddCommand(randomGayLinkAnswer)
 }

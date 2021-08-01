@@ -4,7 +4,9 @@ import (
 	"Digobo/config"
 	"Digobo/discordBot/command"
 	"Digobo/log"
+	"context"
 	"github.com/bwmarrin/discordgo"
+	"github.com/kballard/go-shellquote"
 	"strings"
 )
 
@@ -22,28 +24,27 @@ func mainLoop(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// TODO check if msg of user could be an answer to smth if we have modals (middlewares)
 	// TODO specific server settings through middleware such as languages
 
-	commandParts := strings.SplitN(m.Content, " ", 2)
-	if !strings.HasPrefix(commandParts[0], config.Config.Bot.CommandPrefix) {
+	if !strings.HasPrefix(m.Content, config.Config.Bot.CommandPrefix) {
 		return
 	}
-
-	commandParts[0] = strings.TrimPrefix(commandParts[0], config.Config.Bot.CommandPrefix)
-
-	executedCommand, err := command.Commands.GetCommand(commandParts[0])
+	commandStr := strings.TrimPrefix(m.Content, config.Config.Bot.CommandPrefix)
+	commandArgs, err := shellquote.Split(commandStr)
 	if err != nil {
-		return
-	}
-
-	var args string
-	if len(commandParts) > 1 {
-		args = commandParts[1]
-	}
-
-	err = executedCommand.Execute(args, s, m)
-	if err != nil {
-		_, err = s.ChannelMessageSend(m.ChannelID, "An error occured - please try again")
+		err = SendMessage("quote in commend must be closed!", m.ChannelID, s)
 		if err != nil {
-			log.Error.Println("cant send server message", err)
+			log.Error.Println(err)
+			return
 		}
+	}
+
+	newContext := context.Background()
+	newContext = context.WithValue(newContext, "s", s)
+	newContext = context.WithValue(newContext, "m", m)
+
+	command.RootCommand.SetArgs(commandArgs)
+	err = command.RootCommand.ExecuteContext(newContext)
+	if err != nil {
+		log.Warning.Println("can't execute command", err)
+		return
 	}
 }

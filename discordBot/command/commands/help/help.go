@@ -1,95 +1,103 @@
 package help
 
 import (
+	"Digobo/config"
+	"Digobo/discordBot"
 	"Digobo/discordBot/command"
 	"Digobo/log"
-	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"github.com/spf13/cobra"
+	"strings"
 	"time"
 )
 
-type Help struct{}
-
-func (this *Help) Name() string {
-	return "help"
-}
-
-func (this *Help) Title() string {
-	return "Show this message"
-}
-
-func (this *Help) Description() string {
-	return "The purpose of this command is to help you find the right commands"
-}
-
-func (this *Help) Hidden() bool {
-	return false
-}
-
-func (this *Help) HasInteractions() bool {
-	return false
-}
-
-func (this *Help) Execute(args string, s *discordgo.Session, m *discordgo.MessageCreate) error {
-	// Ignore all messages created by the bot itself
-	// This isn't required in this specific example but it's a good practice.
-	if m.Author.ID == s.State.User.ID {
-		return nil
-	}
-
-	answerChannelID := m.ChannelID
-
-	var embed discordgo.MessageEmbed
-	var fields []*discordgo.MessageEmbedField
-
-	if args == "" {
-		for k, v := range command.Commands.GetCommands() {
-			if v.Hidden() {
-				continue
-			}
-
-			fields = append(fields, &discordgo.MessageEmbedField{Name: k, Value: v.Title(), Inline: false})
-		}
-
-		embed = discordgo.MessageEmbed{
-			Title:       "Help",
-			Description: this.Description(),
-			Timestamp:   time.Now().Format(time.RFC3339),
-			Color:       0x00ff00,
-			Author:      &discordgo.MessageEmbedAuthor{},
-			Fields:      fields,
-		}
-	} else {
-		getCommand, err := command.Commands.GetCommand(args)
-		if err != nil {
-			embed = discordgo.MessageEmbed{
-				Title:       "Not found",
-				Description: fmt.Sprintf("The command %s could not be found!", args),
-				Timestamp:   time.Now().Format(time.RFC3339),
-				Color:       0x00ff00,
-				Author:      &discordgo.MessageEmbedAuthor{},
-			}
-		} else {
-			embed = discordgo.MessageEmbed{
-				Title:       getCommand.Title(),
-				Description: getCommand.Description(),
-				Timestamp:   time.Now().Format(time.RFC3339),
-				Color:       0x00ff00,
-				Author:      &discordgo.MessageEmbedAuthor{},
-			}
-		}
-	}
-
-	_, err := s.ChannelMessageSendEmbed(answerChannelID, &embed)
-	if err != nil {
-		log.Error.Println("can't send embed", err)
-		return err
-	}
-
-
-	return nil
+var helpCommand = &cobra.Command{
+	Use:   "help",
+	Short: "Help about any command",
+	Long: `Help provides help for any command in the bot.
+Simply type ` + config.Config.Bot.CommandPrefix + `help [path to command] for full details.`,
 }
 
 func init() {
-	command.Commands.LoadCommand(&Help{})
+	command.RootCommand.SetHelpCommand(helpCommand)
+	command.RootCommand.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+		s := cmd.Context().Value("s").(*discordgo.Session)
+		m := cmd.Context().Value("m").(*discordgo.MessageCreate)
+
+		args = args[1:]
+
+		commands := command.RootCommand.Commands()
+		usage := config.Config.Bot.CommandPrefix + "[command]"
+		if len(args) > 0 {
+			usage = config.Config.Bot.CommandPrefix + strings.Join(args, " ") + " [command]"
+			cmd = command.RootCommand
+			for _, arg := range args {
+				found := false
+				for _, subCmd := range cmd.Commands() {
+					if subCmd.Use == arg {
+						cmd = subCmd
+						found = true
+						break
+					}
+				}
+
+				if !found {
+					err := discordBot.SendMessage("Command "+config.Config.Bot.CommandPrefix+strings.Join(args, " ")+" not found!", m.ChannelID, s)
+					if err != nil {
+						log.Error.Println("can't send message", err)
+						return
+					}
+				}
+			}
+
+			commands = cmd.Commands()
+		}
+
+		var fields []*discordgo.MessageEmbedField
+
+		var commandFields []*discordgo.MessageEmbedField
+		for _, cmd := range commands {
+			if cmd.Hidden == true {
+				continue
+			}
+
+			commandFields = append(commandFields, &discordgo.MessageEmbedField{
+				Name:   discordBot.Whitespace + cmd.Use,
+				Value:  discordBot.Whitespace + cmd.Short,
+				Inline: false,
+			})
+		}
+
+		if len(commandFields) > 0 {
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   "Available Commands",
+				Value:  "Below is a list of available commands",
+				Inline: false,
+			})
+
+			fields = append(fields, commandFields...)
+		}
+
+		if cmd.Flags().FlagUsages() != "" {
+			fields = append(fields, &discordgo.MessageEmbedField{
+				Name:   "Available Flags",
+				Value:  cmd.Flags().FlagUsages(),
+				Inline: false,
+			})
+		}
+
+		embed := &discordgo.MessageEmbed{
+			Title:       cmd.Use,
+			Description: cmd.Long + "\n\nUsage:\n" + discordBot.Whitespace + usage,
+			Timestamp:   time.Now().Format(time.RFC3339),
+			Color:       config.Config.Bot.DefaultEmbedColor,
+			Author:      &discordgo.MessageEmbedAuthor{},
+			Fields:      fields,
+		}
+
+		err := discordBot.SendEmbed(embed, m.ChannelID, s)
+		if err != nil {
+			log.Error.Println("can't send embed", err)
+		}
+	})
 }

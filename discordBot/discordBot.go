@@ -9,6 +9,8 @@ import (
 	"syscall"
 )
 
+var Whitespace = "⠀"
+
 var instance *discordgo.Session
 
 func GetInstance() *discordgo.Session {
