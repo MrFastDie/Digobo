@@ -9,9 +9,10 @@ import (
 )
 
 var randomGayLinkAnswer = &cobra.Command{
-	Use:   "\U0001F970",
-	Short: "Provides a link to a gay porn",
-	Long:  "This command provides you a link to a gay porn video",
+	Use:    "\U0001F970",
+	Short:  "Provides a link to a gay porn",
+	Long:   "This command provides you a link to a gay porn video",
+	Hidden: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		s := cmd.Context().Value("s").(*discordgo.Session)
 		m := cmd.Context().Value("m").(*discordgo.MessageCreate)
@@ -43,7 +44,6 @@ var randomGayLinkAnswer = &cobra.Command{
 			log.Error.Println("can't send embed", err)
 			return err
 		}
-
 
 		return nil
 	},

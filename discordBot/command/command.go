@@ -18,10 +18,15 @@ var RootCommand = &cobra.Command{
 	Long:  "A discord bot build in go to serve every need on its own discord server",
 }
 
+var completion = &cobra.Command{
+	Use: "completion",
+	Hidden: true,
+}
+
 func LoadCommand(command Command) {
 	RootCommand.AddCommand(command.GetCobraCommand())
 }
 
 func init() {
-
+	RootCommand.AddCommand(completion)
 }

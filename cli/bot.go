@@ -5,7 +5,6 @@ import (
 	"Digobo/discordBot"
 	"Digobo/log"
 	CrawlOsuProfiles "Digobo/scheduler/jobs/crawlOsuProfiles"
-	"Digobo/scheduler/jobs/crawlReminderEvents"
 	"encoding/json"
 	"github.com/spf13/cobra"
 	"time"
@@ -27,7 +26,7 @@ var serveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Info.Println("Starting Discord bot Digobo")
 
-		crawlReminderEvents.CrawlReminderEventJobStart(time.Now(), "")
+		// crawlReminderEvents.CrawlReminderEventJobStart(time.Now(), "")
 
 		osuWatcher, err := database.GetOsuWatchers()
 		if err != nil {
