@@ -30,6 +30,10 @@ type configFile struct {
 			ClientId     int    `yaml:"client_id"`
 			ClientSecret string `yaml:"client_secret"`
 		} `yaml:"osu"`
+		Twitch struct {
+			ClientId     string `yaml:"client_id"`
+			ClientSecret string `yaml:"client_secret"`
+		} `yaml:"twitch"`
 	} `yaml:"apps"`
 }
 

@@ -4,7 +4,9 @@ import (
 	"Digobo/database"
 	"Digobo/discordBot"
 	"Digobo/log"
+	"Digobo/scheduler"
 	CrawlOsuProfiles "Digobo/scheduler/jobs/crawlOsuProfiles"
+	"Digobo/scheduler/jobs/twitchOnline"
 	"encoding/json"
 	"github.com/spf13/cobra"
 	"time"
@@ -14,6 +16,7 @@ import (
 	_ "Digobo/discordBot/command/commands/osuUserWatcher"
 	_ "Digobo/discordBot/command/commands/ping"
 	_ "Digobo/discordBot/command/commands/randomGayLinkAnswer"
+	_ "Digobo/discordBot/command/commands/twitch"
 
 	_ "Digobo/scheduler"
 )
@@ -42,6 +45,29 @@ var serveCmd = &cobra.Command{
 					watcher.OutputChannel,
 				)
 			}
+		}
+
+		twitchWatcher, err := database.GetTwitchWatcher()
+		if err != nil {
+			log.Error.Fatal("can't fetch twitch watcher", err)
+			return
+		}
+
+		for _, watcher := range twitchWatcher {
+			jobData := twitchOnline.Data{
+				UserId:    watcher.UserId,
+				ChannelId: watcher.ChannelId,
+			}
+
+			jobDataBytes, _ := json.Marshal(jobData)
+
+			job := scheduler.Job{
+				ExecutionTime: time.Now(),
+				ExecutionFunc: &twitchOnline.TwitchOnline{},
+				Data:          string(jobDataBytes),
+			}
+
+			scheduler.GetScheduler().AddThresholdJob(job)
 		}
 
 		discordBot.Run()

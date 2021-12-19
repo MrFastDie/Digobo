@@ -1,7 +1,7 @@
 database:
-    name: digibo
-    username: digibo
-    password: digibo
+    name: digobo
+    username: digobo
+    password: digobo
     host: 127.0.0.1
     port: 5432
 discord:
@@ -14,5 +14,8 @@ bot:
     default-embed-color: 'ff0000'
 apps:
     osu:
+        client_id:
+        client_secret:
+    twitch:
         client_id:
         client_secret:

@@ -21,8 +21,8 @@ Simply type ` + config.Config.Bot.CommandPrefix + `help [path to command] for fu
 func init() {
 	command.RootCommand.SetHelpCommand(helpCommand)
 	command.RootCommand.SetHelpFunc(func(cmd *cobra.Command, args []string) {
-		s := cmd.Context().Value("s").(*discordgo.Session)
-		m := cmd.Context().Value("m").(*discordgo.MessageCreate)
+		s := command.CommandS
+		m := command.CommandM
 
 		args = args[1:]
 
