@@ -52,12 +52,6 @@ func Run() {
 		return
 	}
 
-	//emoji := discordgo.Emoji{
-	//	Name:     "smiling_face_with_3_hearts",
-	//	ID:       "863797433845547048",
-	//	Animated: false,
-	//}
-
 	err = instance.UpdateStatusComplex(discordgo.UpdateStatusData{
 		Activities: []*discordgo.Activity{
 			&discordgo.Activity{

@@ -5,6 +5,7 @@ import (
 	"Digobo/config"
 	"Digobo/database"
 	"Digobo/discordBot"
+	"Digobo/discordBot/command"
 	"Digobo/log"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
@@ -17,8 +18,8 @@ var listOsuUserWatcher = &cobra.Command{
 	Short: "list all users from your personal watch list",
 	Long:  "Get a list of all users you are currently watching",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s := cmd.Context().Value("s").(*discordgo.Session)
-		m := cmd.Context().Value("m").(*discordgo.MessageCreate)
+		s := command.CommandS
+		m := command.CommandM
 
 		list, err := database.GetOsuWatcherListByChannel(m.ChannelID)
 		if err != nil && err.Error() == database.NO_ROWS {

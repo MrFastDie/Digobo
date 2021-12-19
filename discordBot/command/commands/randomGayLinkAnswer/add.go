@@ -1,24 +1,23 @@
 package randomGayLinkAnswer
 
 import (
-"Digobo/database"
+	"Digobo/database"
 	"Digobo/discordBot"
 	"Digobo/discordBot/command"
-"Digobo/log"
+	"Digobo/log"
 	"fmt"
-	"github.com/bwmarrin/discordgo"
-"github.com/spf13/cobra"
+	"github.com/spf13/cobra"
 )
 
 var addRandomGayLinkAnswer = &cobra.Command{
-	Use:   "add [url]",
-	Short: "Adds a new gay porn link",
-	Long:  "This command adds a new gay porn link",
+	Use:    "add [url]",
+	Short:  "Adds a new gay porn link",
+	Long:   "This command adds a new gay porn link",
 	Hidden: true,
-	Args: cobra.ExactArgs(1),
+	Args:   cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s := cmd.Context().Value("s").(*discordgo.Session)
-		m := cmd.Context().Value("m").(*discordgo.MessageCreate)
+		s := command.CommandS
+		m := command.CommandM
 
 		// Ignore all messages created by the bot itself
 		// This isn't required in this specific example but it's a good practice.

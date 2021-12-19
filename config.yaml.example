@@ -1,0 +1,18 @@
+database:
+    name: digibo
+    username: digibo
+    password: digibo
+    host: 127.0.0.1
+    port: 5432
+discord:
+    token:
+log:
+    lvl: debug
+    to-stdout: true
+bot:
+    command-prefix: '!'
+    default-embed-color: 'ff0000'
+apps:
+    osu:
+        client_id:
+        client_secret:

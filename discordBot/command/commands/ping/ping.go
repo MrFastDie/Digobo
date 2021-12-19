@@ -15,8 +15,8 @@ var pingCommand = &cobra.Command{
 	Short: "Ping! example",
 	Long:  "This is an example module for commands",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s := cmd.Context().Value("s").(*discordgo.Session)
-		m := cmd.Context().Value("m").(*discordgo.MessageCreate)
+		s := command.CommandS
+		m := command.CommandM
 
 		// Ignore all messages created by the bot itself
 		// This isn't required in this specific example but it's a good practice.

@@ -62,7 +62,8 @@ ALTER TABLE public.osu_user_recent_activity OWNER TO digibo;
 
 CREATE TABLE public.osu_user_watcher (
                                          user_id integer NOT NULL,
-                                         user_name text NOT NULL
+                                         user_name text NOT NULL,
+                                        color integer NULL
 );
 
 
@@ -74,7 +75,8 @@ ALTER TABLE public.osu_user_watcher OWNER TO digibo;
 
 CREATE TABLE public.osu_user_watcher_channel (
                                                  user_id integer NOT NULL,
-                                                 channel_id text NOT NULL
+                                                 channel_id text NOT NULL,
+                                                 color integer NULL
 );
 
 

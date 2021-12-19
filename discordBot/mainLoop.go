@@ -30,19 +30,28 @@ func mainLoop(s *discordgo.Session, m *discordgo.MessageCreate) {
 	commandStr := strings.TrimPrefix(m.Content, config.Config.Bot.CommandPrefix)
 	commandArgs, err := shellquote.Split(commandStr)
 	if err != nil {
-		err = SendMessage("quote in commend must be closed!", m.ChannelID, s)
+		err = SendMessage("quote in command must be closed!", m.ChannelID, s)
 		if err != nil {
 			log.Error.Println(err)
 			return
 		}
 	}
 
-	newContext := context.Background()
-	newContext = context.WithValue(newContext, "s", s)
-	newContext = context.WithValue(newContext, "m", m)
+	ctx := command.RootCommand.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	command.CommandM = m
+	command.CommandS = s
+	//ctx = context.WithValue(ctx, "s", s)
+	//ctx = context.WithValue(ctx, "m", m)
+	//ctx, ctxCancel := context.WithCancel(ctx)
+	//defer ctxCancel()
 
 	command.RootCommand.SetArgs(commandArgs)
-	err = command.RootCommand.ExecuteContext(newContext)
+	err = command.RootCommand.Execute()
+	//err = command.RootCommand.ExecuteContext(ctx)
 	if err != nil {
 		log.Warning.Println("can't execute command", err)
 		return

@@ -3,8 +3,8 @@ package osuUserWatcher
 import (
 	"Digobo/database"
 	"Digobo/discordBot"
+	"Digobo/discordBot/command"
 	"Digobo/log"
-	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/cobra"
 	"strconv"
 )
@@ -13,10 +13,10 @@ var removeOsuUserWatcher = &cobra.Command{
 	Use:   "remove [user_id]",
 	Short: "removes a user from the watch list",
 	Long:  "This command allows you to remove a user from your personal watch list by a given id",
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s := cmd.Context().Value("s").(*discordgo.Session)
-		m := cmd.Context().Value("m").(*discordgo.MessageCreate)
+		s := command.CommandS
+		m := command.CommandM
 
 		userId, err := strconv.Atoi(args[0])
 		if err != nil {

@@ -14,7 +14,10 @@ var migrateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Info.Println("Migrating DB")
 
-		database.Migrate()
+		err := database.Migrate()
+		if err != nil {
+			log.Error.Fatal(err)
+		}
 	},
 }
 

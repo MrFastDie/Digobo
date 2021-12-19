@@ -1,8 +1,12 @@
 package command
 
 import (
+	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/cobra"
 )
+
+var CommandM *discordgo.MessageCreate
+var CommandS *discordgo.Session
 
 // TODO implement event system with states
 type Command interface {
@@ -19,7 +23,7 @@ var RootCommand = &cobra.Command{
 }
 
 var completion = &cobra.Command{
-	Use: "completion",
+	Use:    "completion",
 	Hidden: true,
 }
 

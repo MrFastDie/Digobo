@@ -4,10 +4,10 @@ import (
 	"Digobo/apps/osu"
 	"Digobo/database"
 	"Digobo/discordBot"
+	"Digobo/discordBot/command"
 	"Digobo/log"
 	CrawlOsuProfiles "Digobo/scheduler/jobs/crawlOsuProfiles"
 	"encoding/json"
-	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/cobra"
 	"strconv"
 	"strings"
@@ -18,10 +18,10 @@ var addOsuUserWatcher = &cobra.Command{
 	Use:   "add [user_id]",
 	Short: "adds a user to the watch list",
 	Long:  "This command allows you to stalk a specific osu! user by its given id",
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s := cmd.Context().Value("s").(*discordgo.Session)
-		m := cmd.Context().Value("m").(*discordgo.MessageCreate)
+		s := command.CommandS
+		m := command.CommandM
 
 		userAlreadyPresent := true
 		userId, err := strconv.Atoi(args[0])

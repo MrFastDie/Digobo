@@ -3,7 +3,7 @@ package osuUserWatcher
 import (
 	"Digobo/database"
 	"Digobo/discordBot"
-	"github.com/bwmarrin/discordgo"
+	"Digobo/discordBot/command"
 	"github.com/spf13/cobra"
 	"strconv"
 )
@@ -12,10 +12,10 @@ var colorOsuUserWatcher = &cobra.Command{
 	Use:   "color [user_id] [color_in_hex_without_#]",
 	Short: "changes the embed color of the given user id",
 	Long:  "This command allows you to change the appearance color of the embed created when the user has new updates",
-	Args: cobra.ExactArgs(2),
+	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s := cmd.Context().Value("s").(*discordgo.Session)
-		m := cmd.Context().Value("m").(*discordgo.MessageCreate)
+		s := command.CommandS
+		m := command.CommandM
 
 		userId, err := strconv.Atoi(args[0])
 		if err != nil {
