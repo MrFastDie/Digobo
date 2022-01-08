@@ -33,11 +33,18 @@ func GetUserByLogin(loginName string) User {
 		log.Error.Println(err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+getToken().AccessToken)
+	token, err := getToken()
+	if err != nil {
+		log.Error.Println("OAuth key unavailable - skipping")
+		return User{}
+	}
+
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
 	req.Header.Set("Client-ID", config.Config.Apps.Twitch.ClientId)
 	respRaw, err := client.Do(req)
 	if err != nil {
 		log.Error.Println(err)
+		return User{}
 	}
 
 	defer respRaw.Body.Close()

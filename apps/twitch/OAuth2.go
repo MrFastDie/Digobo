@@ -19,7 +19,7 @@ type Token struct {
 
 var savedToken *Token
 
-func getToken() *Token {
+func getToken() (*Token, error) {
 	if nil == savedToken || savedToken.ExpiresAt.After(time.Now()) {
 		var url = "https://id.twitch.tv/oauth2/token"
 		var payload, _ = json.Marshal(map[string]string{
@@ -35,22 +35,25 @@ func getToken() *Token {
 		respRaw, err := http.Post(url, "application/json", requestBody)
 		if err != nil {
 			log.Error.Println(err)
+			return nil, err
 		}
 
 		defer respRaw.Body.Close()
 		respBytes, err := ioutil.ReadAll(respRaw.Body)
 		if err != nil {
 			log.Error.Println(err)
+			return nil, err
 		}
 
 		err = json.Unmarshal(respBytes, &req)
 		if err != nil {
 			log.Error.Println(err)
+			return nil, err
 		}
 
 		req.ExpiresAt = time.Now().Add(time.Duration(req.ExpiresIn) * time.Second)
 		savedToken = &req
 	}
 
-	return savedToken
+	return savedToken, nil
 }
