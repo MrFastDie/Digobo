@@ -1,1 +1,0 @@
-DROP TABLE random_answer_list;
