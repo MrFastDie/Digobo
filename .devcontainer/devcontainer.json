@@ -1,0 +1,29 @@
+{
+    "name": "Digibo",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspace",
+
+    // Set *default* container specific settings.json values on container create.
+    "settings": { 
+        "sqltools.connections": [{
+            "name": "Container database",
+            "driver": "PostgreSQL",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "database": "postgres",
+            "username": "postgres",
+            "password": "postgres"
+        }]
+    },
+
+    // Add the IDs of extensions you want installed when the container is created.
+    "extensions": [
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "xyz.plsql-language"
+    ],
+
+    "forwardPorts": [3000, 5432]
+}
