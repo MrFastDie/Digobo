@@ -13,6 +13,6 @@ ARG USER_GID=$USER_UID
 COPY . .
 
 RUN apk update && apk upgrade && \
-    apk add --no-cache bash git openssh
+    apk add --no-cache bash git openssh build-base
 
 # RUN go get -v golang.org/x/tools/gopls
