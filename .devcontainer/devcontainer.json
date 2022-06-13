@@ -23,7 +23,8 @@
 		"mtxr.sqltools",
 		"mtxr.sqltools-driver-pg",
 		"xyz.plsql-language",
-		"golang.go"
+		"golang.go",
+		"ms-azuretools.vscode-docker"
 	],
 
     "forwardPorts": [3000, 5432]

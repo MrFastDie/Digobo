@@ -14,3 +14,5 @@ COPY . .
 
 RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh
+
+RUN go get -v golang.org/x/tools/gopls
