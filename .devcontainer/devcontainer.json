@@ -20,10 +20,11 @@
 
     // Add the IDs of extensions you want installed when the container is created.
     "extensions": [
-        "mtxr.sqltools",
-        "mtxr.sqltools-driver-pg",
-        "xyz.plsql-language"
-    ],
+		"mtxr.sqltools",
+		"mtxr.sqltools-driver-pg",
+		"xyz.plsql-language",
+		"golang.go"
+	],
 
     "forwardPorts": [3000, 5432]
 }
