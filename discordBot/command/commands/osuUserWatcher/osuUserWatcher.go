@@ -9,7 +9,6 @@ import (
 var osuUserWatcher = &cobra.Command{
 	Use:   "osuuserwatcher",
 	Short: "Osu User Watcher",
-	Long:  "This command allows you to stalk specific osu! user actions",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return nil
 	},

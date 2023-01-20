@@ -12,10 +12,8 @@ import (
 	"time"
 
 	// load commands when we use the bot
-	_ "Digobo/discordBot/command/commands/help"
 	_ "Digobo/discordBot/command/commands/osuUserWatcher"
 	_ "Digobo/discordBot/command/commands/ping"
-	_ "Digobo/discordBot/command/commands/randomGayLinkAnswer"
 	_ "Digobo/discordBot/command/commands/twitch"
 
 	_ "Digobo/scheduler"

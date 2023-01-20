@@ -10,43 +10,45 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/spf13/cobra"
 	"time"
 )
 
 var addChannel = &cobra.Command{
-	Use:   "add [login_name]",
+	Use:   "add",
 	Short: "adds a user to the watch list",
-	Long:  "Add a streamer to get his live notifications",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		s := command.CommandS
-		m := command.CommandM
+		i := command.CommandI
+
+		discordBot.SendInteractionMessage("Command received", s, i)
 
 		user := twitch2.GetUserByLogin(args[0])
 		if 0 == len(user.Data) {
-			discordBot.SendMessage("No user found with provided login name", m.ChannelID, s)
+			discordBot.SendMessageFromInteraction("No user found with provided login name", s, i)
 			return errors.New("no twitch user found")
 		}
 
-		_, err := database.GetTwitchWatcherByUserAndChannel(user.Data[0].Id, m.ChannelID)
+		_, err := database.GetTwitchWatcherByUserAndChannel(user.Data[0].Id, i.ChannelID)
 		if err != sql.ErrNoRows {
-			discordBot.SendMessage("An error occurred, please try again later.", m.ChannelID, s)
+			discordBot.SendMessageFromInteraction("An error occurred, please try again later.", s, i)
 			return err
 		} else if err == nil {
-			discordBot.SendMessage("The user has already been added to this channel.", m.ChannelID, s)
+			discordBot.SendMessageFromInteraction("The user has already been added to this channel.", s, i)
 			return nil
 		}
 
-		err = database.AddTwitchWatcher(user.Data[0].Id, m.ChannelID, false)
+		err = database.AddTwitchWatcher(user.Data[0].Id, i.ChannelID, false)
 		if err != nil {
-			discordBot.SendMessage("An error occurred, please try again later.", m.ChannelID, s)
+			discordBot.SendMessageFromInteraction("An error occurred, please try again later.", s, i)
 			return err
 		}
 
 		jobData := twitchOnline.Data{
 			UserId:    user.Data[0].Id,
-			ChannelId: m.ChannelID,
+			ChannelId: i.ChannelID,
 		}
 
 		jobDataBytes, _ := json.Marshal(jobData)
@@ -59,7 +61,6 @@ var addChannel = &cobra.Command{
 
 		scheduler.GetScheduler().AddScheduledJob(job)
 
-		discordBot.SendMessage(args[0]+" has been added to this channel", m.ChannelID, s)
-		return nil
+		return discordBot.SendMessageFromInteraction(fmt.Sprintf("%s has been added to this channel", args[0]), s, i)
 	},
 }

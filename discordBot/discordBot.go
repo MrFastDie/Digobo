@@ -2,8 +2,11 @@ package discordBot
 
 import (
 	"Digobo/config"
+	"Digobo/discordBot/command"
 	"Digobo/log"
+	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,6 +15,8 @@ import (
 var Whitespace = "⠀"
 
 var instance *discordgo.Session
+
+var commands []*discordgo.ApplicationCommand
 
 func GetInstance() *discordgo.Session {
 	var err error
@@ -34,6 +39,46 @@ func Close() {
 	}
 
 	instance = nil
+}
+
+func createCommands(command []*cobra.Command) []*discordgo.ApplicationCommand {
+	var commands []*discordgo.ApplicationCommand
+
+	for _, v := range command {
+		var cmd = &discordgo.ApplicationCommand{
+			Name:        v.Use,
+			Description: v.Short,
+		}
+
+		if len(v.Commands()) > 0 {
+			cmd.Options = createOptions(v.Commands())
+		}
+
+		commands = append(commands, cmd)
+	}
+
+	return commands
+}
+
+func createOptions(command []*cobra.Command) []*discordgo.ApplicationCommandOption {
+	var options []*discordgo.ApplicationCommandOption
+
+	for _, v := range command {
+		var cmd = &discordgo.ApplicationCommandOption{
+			Name:        v.Use,
+			Description: v.Short,
+			Type:        discordgo.ApplicationCommandOptionString,
+		}
+
+		if len(v.Commands()) > 0 {
+			cmd.Type = discordgo.ApplicationCommandOptionSubCommand
+			cmd.Options = createOptions(v.Commands())
+		}
+
+		options = append(options, cmd)
+	}
+
+	return options
 }
 
 func Run() {
@@ -68,6 +113,21 @@ func Run() {
 
 	// Wait here until CTRL-C or other term signal is received.
 	log.Info.Println("Discord bot Digobo is now running.")
+
+	commands = createCommands(command.RootCommand.Commands())
+
+	for i, v := range commands {
+		if v == nil {
+			continue
+		}
+
+		_, err := instance.ApplicationCommandCreate(instance.State.User.ID, "", commands[i])
+		if err != nil {
+			log.Error.Fatal(fmt.Sprintf("unable to add command %s", v.Name), err)
+			return
+		}
+	}
+
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
@@ -85,6 +145,26 @@ func SendMessage(msg string, channelId string, s *discordgo.Session) error {
 	}
 
 	return nil
+}
+
+func SendMessageFromInteraction(msg string, s *discordgo.Session, i *discordgo.InteractionCreate) error {
+	_, err := s.ChannelMessageSend(i.ChannelID, msg)
+	if err != nil {
+		log.Error.Println("can't send channel message", err)
+
+		return err
+	}
+
+	return nil
+}
+
+func SendInteractionMessage(msg string, s *discordgo.Session, i *discordgo.InteractionCreate) error {
+	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: msg,
+		},
+	})
 }
 
 func SendEmbed(embed *discordgo.MessageEmbed, channelId string, s *discordgo.Session) error {

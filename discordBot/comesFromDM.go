@@ -2,10 +2,10 @@ package discordBot
 
 import "github.com/bwmarrin/discordgo"
 
-func ComesFromDM(s *discordgo.Session, m *discordgo.MessageCreate) (bool, error) {
-	channel, err := s.State.Channel(m.ChannelID)
+func ComesFromDM(s *discordgo.Session, i *discordgo.InteractionCreate) (bool, error) {
+	channel, err := s.State.Channel(i.ChannelID)
 	if err != nil {
-		if channel, err = s.Channel(m.ChannelID); err != nil {
+		if channel, err = s.Channel(i.ChannelID); err != nil {
 			return false, err
 		}
 	}

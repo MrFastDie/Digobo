@@ -10,28 +10,29 @@ import (
 )
 
 var removeOsuUserWatcher = &cobra.Command{
-	Use:   "remove [user_id]",
+	Use:   "remove",
 	Short: "removes a user from the watch list",
-	Long:  "This command allows you to remove a user from your personal watch list by a given id",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		s := command.CommandS
-		m := command.CommandM
+		i := command.CommandI
+
+		discordBot.SendInteractionMessage("Command received", s, i)
 
 		userId, err := strconv.Atoi(args[0])
 		if err != nil {
-			discordBot.SendMessage("Please provide a valid user_id", m.ChannelID, s)
+			discordBot.SendMessage("Please provide a valid user_id", i.ChannelID, s)
 			return err
 		}
 
-		err = database.RemoveOsuWatcherOutputChannel(userId, m.ChannelID)
+		err = database.RemoveOsuWatcherOutputChannel(userId, i.ChannelID)
 		if err != nil {
 			log.Error.Println("cant delete output channel from DB", err)
-			discordBot.SendMessage("An error occurred, please try again later", m.ChannelID, s)
+			discordBot.SendMessage("An error occurred, please try again later", i.ChannelID, s)
 			return err
 		}
 
-		discordBot.SendMessage("Removal has been successful", m.ChannelID, s)
+		discordBot.SendMessage("Removal has been successful", i.ChannelID, s)
 		return nil
 	},
 }

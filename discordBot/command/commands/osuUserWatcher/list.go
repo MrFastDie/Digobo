@@ -16,14 +16,15 @@ import (
 var listOsuUserWatcher = &cobra.Command{
 	Use:   "list",
 	Short: "list all users from your personal watch list",
-	Long:  "Get a list of all users you are currently watching",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		s := command.CommandS
-		m := command.CommandM
+		i := command.CommandI
 
-		list, err := database.GetOsuWatcherListByChannel(m.ChannelID)
+		discordBot.SendInteractionMessage("Command received", s, i)
+
+		list, err := database.GetOsuWatcherListByChannel(i.ChannelID)
 		if err != nil && err.Error() == database.NO_ROWS {
-			discordBot.SendMessage("There are currently no member in your watch list", m.ChannelID, s)
+			discordBot.SendMessage("There are currently no member in your watch list", i.ChannelID, s)
 			return nil
 		} else if err != nil {
 			log.Error.Println("can't fetch osu watcher list", err)
@@ -48,7 +49,7 @@ var listOsuUserWatcher = &cobra.Command{
 			Fields:      fields,
 		}
 
-		err = discordBot.SendEmbed(embed, m.ChannelID, s)
+		err = discordBot.SendEmbed(embed, i.ChannelID, s)
 		if err != nil {
 			return err
 		}

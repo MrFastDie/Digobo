@@ -15,18 +15,19 @@ import (
 )
 
 var addOsuUserWatcher = &cobra.Command{
-	Use:   "add [user_id]",
+	Use:   "add",
 	Short: "adds a user to the watch list",
-	Long:  "This command allows you to stalk a specific osu! user by its given id",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		s := command.CommandS
-		m := command.CommandM
+		i := command.CommandI
+
+		discordBot.SendInteractionMessage("Command received", s, i)
 
 		userAlreadyPresent := true
 		userId, err := strconv.Atoi(args[0])
 		if err != nil {
-			discordBot.SendMessage("Please provide a valid user_id", m.ChannelID, s)
+			discordBot.SendMessage("Please provide a valid user_id", i.ChannelID, s)
 			return err
 		}
 
@@ -35,14 +36,14 @@ var addOsuUserWatcher = &cobra.Command{
 			osuUser, err := osu.GetUser(userId)
 			if err != nil {
 				log.Info.Println("can't fetch osu! user from API")
-				discordBot.SendMessage("No user found with provided user_id", m.ChannelID, s)
+				discordBot.SendMessage("No user found with provided user_id", i.ChannelID, s)
 				return err
 			}
 
 			err = database.AddOsuWatcherUser(userId, osuUser.Username)
 			if err != nil {
 				log.Error.Println("can't add osu! user to DB", err)
-				discordBot.SendMessage("An error occurred, please try again later", m.ChannelID, s)
+				discordBot.SendMessage("An error occurred, please try again later", i.ChannelID, s)
 				return err
 			}
 
@@ -50,17 +51,17 @@ var addOsuUserWatcher = &cobra.Command{
 			user, _ = database.GetOsuWatcher(userId)
 		} else if err != nil {
 			log.Error.Println("can't fetch osu! user from db", err)
-			discordBot.SendMessage("An error occurred, please try again later", m.ChannelID, s)
+			discordBot.SendMessage("An error occurred, please try again later", i.ChannelID, s)
 			return err
 		}
 
-		err = database.AddOsuWatcherOutputChannel(userId, m.ChannelID)
+		err = database.AddOsuWatcherOutputChannel(userId, i.ChannelID)
 		if err != nil && strings.Contains(err.Error(), database.PQ_DUPLICATES) {
-			discordBot.SendMessage("User has already been added", m.ChannelID, s)
+			discordBot.SendMessage("User has already been added", i.ChannelID, s)
 			return nil
 		} else if err != nil {
 			log.Error.Println("can't add channel to osu! user in db", err)
-			discordBot.SendMessage("An error occurred, please try again later", m.ChannelID, s)
+			discordBot.SendMessage("An error occurred, please try again later", i.ChannelID, s)
 			return err
 		}
 
@@ -71,7 +72,7 @@ var addOsuUserWatcher = &cobra.Command{
 				Retries:  0,
 				OutputChannel: []database.OsuOutputChannel{
 					{
-						ChannelId: m.ChannelID,
+						ChannelId: i.ChannelID,
 					},
 				},
 			}
@@ -79,7 +80,7 @@ var addOsuUserWatcher = &cobra.Command{
 			CrawlOsuProfiles.CrawlOsuProfilesJobStart(time.Now(), string(CrawlStrData))
 		}
 
-		discordBot.SendMessage(user.UserName+" has been added to this channel", m.ChannelID, s)
+		discordBot.SendMessage(user.UserName+" has been added to this channel", i.ChannelID, s)
 		return nil
 	},
 }
