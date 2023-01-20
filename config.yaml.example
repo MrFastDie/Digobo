@@ -10,7 +10,6 @@ log:
     lvl: debug
     to-stdout: true
 bot:
-    command-prefix: '!'
     default-embed-color: 16711680
 apps:
     osu:
