@@ -8,24 +8,22 @@ import (
 	"Digobo/log"
 	CrawlOsuProfiles "Digobo/scheduler/jobs/crawlOsuProfiles"
 	"encoding/json"
-	"github.com/spf13/cobra"
+	"github.com/bwmarrin/discordgo"
 	"strconv"
 	"strings"
 	"time"
 )
 
-var addOsuUserWatcher = &cobra.Command{
-	Use:   "add",
-	Short: "adds a user to the watch list",
-	Args:  cobra.ExactArgs(1),
-	RunE: func(cmd *cobra.Command, args []string) error {
-		s := command.CommandS
-		i := command.CommandI
-
+var Add = command.SubCommand{
+	Name:        "add",
+	Description: "Adds a user to the watch list",
+	Type:        discordgo.ApplicationCommandOptionString,
+	SubCommands: nil,
+	Execute: func(s *discordgo.Session, i *discordgo.InteractionCreate, args interface{}) error {
 		discordBot.SendInteractionMessage("Command received", s, i)
 
 		userAlreadyPresent := true
-		userId, err := strconv.Atoi(args[0])
+		userId, err := strconv.Atoi(args.(string))
 		if err != nil {
 			discordBot.SendMessage("Please provide a valid user_id", i.ChannelID, s)
 			return err

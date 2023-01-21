@@ -4,19 +4,20 @@ import (
 	"Digobo/database"
 	"Digobo/discordBot"
 	"Digobo/discordBot/command"
-	"github.com/spf13/cobra"
+	"github.com/bwmarrin/discordgo"
 	"strconv"
+	"strings"
 )
 
-var colorOsuUserWatcher = &cobra.Command{
-	Use:   "color",
-	Short: "changes the embed color of the given user id: color <userId> <colorHex>",
-	Args:  cobra.ExactArgs(2),
-	RunE: func(cmd *cobra.Command, args []string) error {
-		s := command.CommandS
-		i := command.CommandI
-
+var Color = command.SubCommand{
+	Name:        "color",
+	Description: "Changes the embed color of the given user id: color <userId> <colorHex>",
+	Type:        discordgo.ApplicationCommandOptionString,
+	SubCommands: nil,
+	Execute: func(s *discordgo.Session, i *discordgo.InteractionCreate, oArgs interface{}) error {
 		discordBot.SendInteractionMessage("Command received", s, i)
+
+		args := strings.Split(oArgs.(string), " ")
 
 		userId, err := strconv.Atoi(args[0])
 		if err != nil {

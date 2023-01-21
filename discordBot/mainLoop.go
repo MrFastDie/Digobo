@@ -3,6 +3,7 @@ package discordBot
 import (
 	"Digobo/discordBot/command"
 	"Digobo/log"
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"strings"
 )
@@ -17,13 +18,25 @@ func mainLoop(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	log.Debug.Printf("Received slash command: %s\n", commandStr)
 
-	command.CommandI = i
-	command.CommandS = s
-
-	command.RootCommand.SetArgs(commandStr)
-	err := command.RootCommand.Execute()
-	if err != nil {
-		log.Warning.Println("can't execute command", err)
+	rootCmd, ok := command.Map[i.ApplicationCommandData().Name]
+	if !ok {
+		SendInteractionMessage(fmt.Sprintf("Unknown command %s", i.ApplicationCommandData().Name), s, i)
 		return
 	}
+
+	if len(i.ApplicationCommandData().Options) > 0 {
+		for _, subCommand := range i.ApplicationCommandData().Options {
+			cmd, ok := rootCmd.SubCommands[subCommand.Name]
+			if !ok {
+				SendMessage(fmt.Sprintf("Unknown subcommand %s", subCommand.Name), i.ChannelID, s)
+				continue
+			}
+
+			cmd.Execute(s, i, subCommand.Value)
+		}
+
+		return
+	}
+
+	rootCmd.Execute(s, i)
 }

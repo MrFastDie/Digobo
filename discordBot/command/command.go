@@ -5,8 +5,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var CommandI *discordgo.InteractionCreate
-var CommandS *discordgo.Session
+type Command struct {
+	Name        string
+	Description string
+
+	SubCommands map[string]SubCommand
+
+	Execute func(s *discordgo.Session, i *discordgo.InteractionCreate) error
+}
 
 var RootCommand = &cobra.Command{
 	Use:   "digobo",

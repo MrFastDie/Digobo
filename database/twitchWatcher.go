@@ -35,6 +35,16 @@ func GetTwitchWatcherByUserAndChannel(userId, channelId string) (TwitchWatcher, 
 	return ret, nil
 }
 
+func GetTwitchWatchersByChannel(channelId string) ([]TwitchWatcher, error) {
+	var ret []TwitchWatcher
+	err := db.Select(&ret, `SELECT row_to_json(d) FROM (SELECT * FROM twitch_watcher WHERE channel_id = $1) d`, channelId)
+	if err != nil {
+		return nil, err
+	}
+
+	return ret, nil
+}
+
 func AddTwitchWatcher(userId, channelId string, online bool) error {
 	_, err := db.Exec(`INSERT INTO twitch_watcher (user_id, channel_id, online) VALUES ($1, $2, $3)`, userId, channelId, online)
 	if err != nil {

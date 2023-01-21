@@ -11,21 +11,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/spf13/cobra"
+	"github.com/bwmarrin/discordgo"
 	"time"
 )
 
-var addChannel = &cobra.Command{
-	Use:   "add",
-	Short: "adds a user to the watch list",
-	Args:  cobra.ExactArgs(1),
-	RunE: func(cmd *cobra.Command, args []string) error {
-		s := command.CommandS
-		i := command.CommandI
-
+var AddChannel = command.SubCommand{
+	Name:        "add",
+	Description: "adds a given user to the watch list",
+	Type:        discordgo.ApplicationCommandOptionString,
+	SubCommands: nil,
+	Execute: func(s *discordgo.Session, i *discordgo.InteractionCreate, args interface{}) error {
 		discordBot.SendInteractionMessage("Command received", s, i)
 
-		user := twitch2.GetUserByLogin(args[0])
+		user := twitch2.GetUserByLogin(args.(string))
 		if 0 == len(user.Data) {
 			discordBot.SendMessageFromInteraction("No user found with provided login name", s, i)
 			return errors.New("no twitch user found")
@@ -61,6 +59,6 @@ var addChannel = &cobra.Command{
 
 		scheduler.GetScheduler().AddScheduledJob(job)
 
-		return discordBot.SendMessageFromInteraction(fmt.Sprintf("%s has been added to this channel", args[0]), s, i)
+		return discordBot.SendMessageFromInteraction(fmt.Sprintf("%s has been added to this channel", args.(string)), s, i)
 	},
 }

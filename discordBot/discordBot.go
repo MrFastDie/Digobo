@@ -6,13 +6,11 @@ import (
 	"Digobo/log"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
-	"github.com/spf13/cobra"
+	"golang.org/x/exp/maps"
 	"os"
 	"os/signal"
 	"syscall"
 )
-
-var Whitespace = "⠀"
 
 var instance *discordgo.Session
 
@@ -41,17 +39,17 @@ func Close() {
 	instance = nil
 }
 
-func createCommands(command []*cobra.Command) []*discordgo.ApplicationCommand {
+func createCommands(command []command.Command) []*discordgo.ApplicationCommand {
 	var commands []*discordgo.ApplicationCommand
 
 	for _, v := range command {
 		var cmd = &discordgo.ApplicationCommand{
-			Name:        v.Use,
-			Description: v.Short,
+			Name:        v.Name,
+			Description: v.Description,
 		}
 
-		if len(v.Commands()) > 0 {
-			cmd.Options = createOptions(v.Commands())
+		if len(v.SubCommands) > 0 {
+			cmd.Options = createOptions(maps.Values(v.SubCommands))
 		}
 
 		commands = append(commands, cmd)
@@ -60,19 +58,19 @@ func createCommands(command []*cobra.Command) []*discordgo.ApplicationCommand {
 	return commands
 }
 
-func createOptions(command []*cobra.Command) []*discordgo.ApplicationCommandOption {
+func createOptions(command []command.SubCommand) []*discordgo.ApplicationCommandOption {
 	var options []*discordgo.ApplicationCommandOption
 
 	for _, v := range command {
 		var cmd = &discordgo.ApplicationCommandOption{
-			Name:        v.Use,
-			Description: v.Short,
-			Type:        discordgo.ApplicationCommandOptionString,
+			Name:        v.Name,
+			Description: v.Description,
+			Type:        v.Type,
 		}
 
-		if len(v.Commands()) > 0 {
+		if len(v.SubCommands) > 0 {
 			cmd.Type = discordgo.ApplicationCommandOptionSubCommand
-			cmd.Options = createOptions(v.Commands())
+			cmd.Options = createOptions(maps.Values(v.SubCommands))
 		}
 
 		options = append(options, cmd)
@@ -114,7 +112,16 @@ func Run() {
 	// Wait here until CTRL-C or other term signal is received.
 	log.Info.Println("Discord bot Digobo is now running.")
 
-	commands = createCommands(command.RootCommand.Commands())
+	commands = createCommands(maps.Values(command.Map))
+
+	oldCommands, err := instance.ApplicationCommands(instance.State.User.ID, "")
+	if err != nil {
+		log.Error.Println("unable to fetch all application commands")
+	}
+	for _, oldCommand := range oldCommands {
+		// Clean up all commands to register them new
+		instance.ApplicationCommandDelete(instance.State.User.ID, "", oldCommand.ID)
+	}
 
 	for i, v := range commands {
 		if v == nil {

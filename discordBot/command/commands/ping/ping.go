@@ -5,17 +5,14 @@ import (
 	"Digobo/discordBot/command"
 	"Digobo/log"
 	"github.com/bwmarrin/discordgo"
-	"github.com/spf13/cobra"
 	"time"
 )
 
-var pingCommand = &cobra.Command{
-	Use:   "ping",
-	Short: "Ping! example",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		s := command.CommandS
-		i := command.CommandI
-
+var Command = command.Command{
+	Name:        "ping",
+	Description: "Ping! example",
+	SubCommands: nil,
+	Execute: func(s *discordgo.Session, i *discordgo.InteractionCreate) error {
 		embeds := []*discordgo.MessageEmbed{{
 			Title:       "Pong!",
 			Description: "This is the Pong! embed",
@@ -52,5 +49,5 @@ var pingCommand = &cobra.Command{
 }
 
 func init() {
-	command.RootCommand.AddCommand(pingCommand)
+	command.Map[Command.Name] = Command
 }
