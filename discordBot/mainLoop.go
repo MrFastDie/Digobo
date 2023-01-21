@@ -1,15 +1,24 @@
 package discordBot
 
 import (
+	"Digobo/config"
 	"Digobo/discordBot/command"
 	"Digobo/log"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"regexp"
 	"strings"
 )
 
 func mainLoop(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	commandStr := []string{i.ApplicationCommandData().Name}
+
+	applicationName := i.ApplicationCommandData().Name
+	if "" != config.Config.Bot.CommandPrefix {
+		reStr := regexp.MustCompile("^(.*?)" + config.Config.Bot.CommandPrefix + "-(.*)$")
+		repStr := "${1}$2"
+		applicationName = reStr.ReplaceAllString(applicationName, repStr)
+	}
 
 	if len(i.ApplicationCommandData().Options) > 0 {
 		commandStr = append(commandStr, i.ApplicationCommandData().Options[0].Name)
@@ -18,7 +27,7 @@ func mainLoop(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	log.Debug.Printf("Received slash command: %s\n", commandStr)
 
-	rootCmd, ok := command.Map[i.ApplicationCommandData().Name]
+	rootCmd, ok := command.GetMap()[applicationName]
 	if !ok {
 		SendInteractionMessage(fmt.Sprintf("Unknown command %s", i.ApplicationCommandData().Name), s, i)
 		return

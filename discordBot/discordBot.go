@@ -48,6 +48,10 @@ func createCommands(command []command.Command) []*discordgo.ApplicationCommand {
 			Description: v.Description,
 		}
 
+		if "" != config.Config.Bot.CommandPrefix {
+			cmd.Name = fmt.Sprintf("%s-%s", config.Config.Bot.CommandPrefix, v.Name)
+		}
+
 		if len(v.SubCommands) > 0 {
 			cmd.Options = createOptions(maps.Values(v.SubCommands))
 		}
@@ -112,14 +116,13 @@ func Run() {
 	// Wait here until CTRL-C or other term signal is received.
 	log.Info.Println("Discord bot Digobo is now running.")
 
-	commands = createCommands(maps.Values(command.Map))
+	commands = createCommands(maps.Values(command.GetMap()))
 
 	oldCommands, err := instance.ApplicationCommands(instance.State.User.ID, "")
 	if err != nil {
 		log.Error.Println("unable to fetch all application commands")
 	}
 	for _, oldCommand := range oldCommands {
-		// Clean up all commands to register them new
 		instance.ApplicationCommandDelete(instance.State.User.ID, "", oldCommand.ID)
 	}
 

@@ -22,7 +22,8 @@ type configFile struct {
 		ToStdout bool   `yaml:"to-stdout"`
 	} `yaml:"log"`
 	Bot struct {
-		DefaultEmbedColor int `yaml:"default-embed-color"`
+		CommandPrefix     string `yaml:"command-prefix"`
+		DefaultEmbedColor int    `yaml:"default-embed-color"`
 	} `yaml:"bot"`
 	Apps struct {
 		Osu struct {

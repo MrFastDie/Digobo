@@ -49,5 +49,5 @@ var Command = command.Command{
 }
 
 func init() {
-	command.Map[Command.Name] = Command
+	command.AddCommand(Command)
 }

@@ -64,5 +64,5 @@ func hasChannel(channelId string, channelList []database.OsuOutputChannel) bool 
 }
 
 func init() {
-	command.Map[Command.Name] = Command
+	command.AddCommand(Command)
 }
