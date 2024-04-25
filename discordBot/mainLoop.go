@@ -11,6 +11,23 @@ import (
 )
 
 func mainLoop(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	switch i.Type {
+	case discordgo.InteractionApplicationCommand:
+		execCommands(s, i)
+		break
+	case discordgo.InteractionMessageComponent:
+		// To get the custom ID of that message
+		//SendInteractionMessage(i.MessageComponentData().CustomID, s, i)
+		SendInteractionMessage("Interaction type not implemented", s, i)
+		break
+	default:
+		SendInteractionMessage("Interaction type not implemented", s, i)
+	}
+
+	fmt.Println(i.Type)
+}
+
+func execCommands(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	commandStr := []string{i.ApplicationCommandData().Name}
 
 	applicationName := i.ApplicationCommandData().Name

@@ -113,9 +113,6 @@ func Run() {
 		log.Warning.Println("can't update Bot's status", err)
 	}
 
-	// Wait here until CTRL-C or other term signal is received.
-	log.Info.Println("Discord bot Digobo is now running.")
-
 	commands = createCommands(maps.Values(command.GetMap()))
 
 	oldCommands, err := instance.ApplicationCommands(instance.State.User.ID, "")
@@ -137,6 +134,9 @@ func Run() {
 			return
 		}
 	}
+
+	// Wait here until CTRL-C or other term signal is received.
+	log.Info.Println("Discord bot Digobo is now running.")
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)

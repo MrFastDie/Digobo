@@ -37,6 +37,20 @@ var Command = command.Command{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: embeds,
+				Components: []discordgo.MessageComponent{
+					discordgo.ActionsRow{
+						Components: []discordgo.MessageComponent{
+							discordgo.Button{
+								Style:    discordgo.SecondaryButton,
+								Disabled: false,
+								CustomID: "ping",
+								Emoji: &discordgo.ComponentEmoji{
+									Name: "🤷",
+								},
+							},
+						},
+					},
+				},
 			},
 		})
 		if err != nil {

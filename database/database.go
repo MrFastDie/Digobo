@@ -4,35 +4,37 @@ import (
 	"Digobo/config"
 	"database/sql"
 	"fmt"
-	"github.com/Femaref/dbx"
-	"github.com/lib/pq"
+	"github.com/jmoiron/sqlx"
 	"github.com/mattes/migrate"
 	"github.com/mattes/migrate/database/postgres"
 	_ "github.com/mattes/migrate/source/file"
+	"log"
 )
 
-var db dbx.DBAccess
+var db *sqlx.DB
 
 func Init() {
-	db, _ = connect()
+	connect()
 }
 
 const NO_ROWS = "sql: no rows in result set"
 const PQ_DUPLICATES = "pq: duplicate key value violates unique constraint"
 
 func TestDatabase() error {
-	_, err := connect()
+	connect()
 
-	return err
+	return nil
 }
 
-func connect() (dbx.DBAccess, error) {
+func connect() {
 	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.Config.Database.Username, config.Config.Database.Password, config.Config.Database.Host, config.Config.Database.Port, config.Config.Database.Password)
-	dbx.Configure("postgres", connString)
-	dbx.QuoteIdentifier = pq.QuoteIdentifier
+	localDb, err := sqlx.Connect("postgres", connString)
 
-	db := dbx.MustConnect()
-	return db, db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db = localDb
 }
 
 func Migrate() error {
