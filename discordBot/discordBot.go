@@ -113,25 +113,55 @@ func Run() {
 		log.Warning.Println("can't update Bot's status", err)
 	}
 
+	// TODO get a version for a command, if that command changes, update it here - if not dont
+	// TODO make guild specific commands
 	commands = createCommands(maps.Values(command.GetMap()))
 
 	oldCommands, err := instance.ApplicationCommands(instance.State.User.ID, "")
 	if err != nil {
 		log.Error.Println("unable to fetch all application commands")
 	}
-	for _, oldCommand := range oldCommands {
-		instance.ApplicationCommandDelete(instance.State.User.ID, "", oldCommand.ID)
+
+	desiredMap := make(map[string]*discordgo.ApplicationCommand)
+	for _, cmd := range commands {
+		desiredMap[cmd.Name] = cmd
 	}
 
-	for i, v := range commands {
-		if v == nil {
-			continue
-		}
+	existingMap := make(map[string]*discordgo.ApplicationCommand)
+	for _, cmd := range oldCommands {
+		existingMap[cmd.Name] = cmd
+	}
 
-		_, err := instance.ApplicationCommandCreate(instance.State.User.ID, "", commands[i])
-		if err != nil {
-			log.Error.Fatal(fmt.Sprintf("unable to add command %s", v.Name), err)
-			return
+	// Delete commands not in the desired list
+	for _, cmd := range oldCommands {
+		if _, found := desiredMap[cmd.Name]; !found {
+			err := instance.ApplicationCommandDelete(instance.State.User.ID, "", cmd.ID)
+			if err != nil {
+				log.Error.Printf("Failed to delete command %s (%s) in guild %s: %v\n", cmd.Name, cmd.ID, "", err)
+			} else {
+				log.Error.Printf("Successfully deleted command %s (%s) in guild %s\n", cmd.Name, cmd.ID, "")
+			}
+		}
+	}
+
+	// Create or update existing commands
+	for _, cmd := range commands {
+		if existingCmd, found := existingMap[cmd.Name]; found {
+			// Edit existing command
+			_, err := instance.ApplicationCommandEdit(instance.State.User.ID, "", existingCmd.ID, cmd)
+			if err != nil {
+				log.Error.Printf("Failed to edit command %s (%s) in guild %s: %v\n", cmd.Name, cmd.ID, "", err)
+			} else {
+				log.Error.Printf("Successfully edited command %s (%s) in guild %s\n", cmd.Name, cmd.ID, "")
+			}
+		} else {
+			// Create new command
+			_, err := instance.ApplicationCommandCreate(instance.State.User.ID, "", cmd)
+			if err != nil {
+				log.Error.Printf("Failed to create command %s in guild %s: %v\n", cmd.Name, "", err)
+			} else {
+				log.Error.Printf("Successfully created command %s in guild %s\n", cmd.Name, "")
+			}
 		}
 	}
 

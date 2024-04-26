@@ -23,8 +23,6 @@ func mainLoop(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	default:
 		SendInteractionMessage("Interaction type not implemented", s, i)
 	}
-
-	fmt.Println(i.Type)
 }
 
 func execCommands(s *discordgo.Session, i *discordgo.InteractionCreate) {
