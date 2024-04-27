@@ -27,7 +27,8 @@ func TestDatabase() error {
 }
 
 func connect() {
-	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.Config.Database.Username, config.Config.Database.Password, config.Config.Database.Host, config.Config.Database.Port, config.Config.Database.Password)
+	connString := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
+		config.Config.Database.Username, config.Config.Database.Password, config.Config.Database.Name, config.Config.Database.Host, config.Config.Database.Port)
 	localDb, err := sqlx.Connect("postgres", connString)
 
 	if err != nil {
@@ -38,7 +39,9 @@ func connect() {
 }
 
 func Migrate() error {
-	db, err := sql.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.Config.Database.Username, config.Config.Database.Password, config.Config.Database.Host, config.Config.Database.Port, config.Config.Database.Password))
+	connString := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
+		config.Config.Database.Username, config.Config.Database.Password, config.Config.Database.Name, config.Config.Database.Host, config.Config.Database.Port)
+	db, err := sql.Open("postgres", connString)
 	if err != nil {
 		return err
 	}

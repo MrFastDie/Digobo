@@ -6,11 +6,14 @@ import (
 	"Digobo/log"
 	"Digobo/scheduler"
 	CrawlOsuProfiles "Digobo/scheduler/jobs/crawlOsuProfiles"
+	"Digobo/scheduler/jobs/messageSender"
 	"Digobo/scheduler/jobs/twitchOnline"
 	"encoding/json"
 	"github.com/spf13/cobra"
 	"time"
 
+	_ "Digobo/discordBot/command/commands/cat"
+	_ "Digobo/discordBot/command/commands/waifu"
 	// load commands when we use the bot
 	_ "Digobo/discordBot/command/commands/osuUserWatcher"
 	_ "Digobo/discordBot/command/commands/ping"
@@ -67,6 +70,20 @@ var serveCmd = &cobra.Command{
 
 			scheduler.GetScheduler().AddThresholdJob(job)
 		}
+
+		jobData := messageSender.Data{
+			ChannelId: "835175407216623727",
+		}
+
+		jobDataBytes, _ := json.Marshal(jobData)
+
+		job := scheduler.Job{
+			ExecutionTime: time.Now(),
+			ExecutionFunc: &messageSender.MessageSender{},
+			Data:          string(jobDataBytes),
+		}
+
+		scheduler.GetScheduler().AddThresholdJob(job)
 
 		discordBot.Run()
 	},
