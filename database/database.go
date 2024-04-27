@@ -2,7 +2,6 @@ package database
 
 import (
 	"Digobo/config"
-	"database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/mattes/migrate"
@@ -14,36 +13,36 @@ import (
 var db *sqlx.DB
 
 func Init() {
-	connect()
+	var err error
+
+	db, err = connect()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 const NO_ROWS = "sql: no rows in result set"
 const PQ_DUPLICATES = "pq: duplicate key value violates unique constraint"
 
-func TestDatabase() error {
-	connect()
-
-	return nil
-}
-
-func connect() {
-	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.Config.Database.Username, config.Config.Database.Password, config.Config.Database.Host, config.Config.Database.Port, config.Config.Database.Password)
+func connect() (*sqlx.DB, error) {
+	connString := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
+		config.Config.Database.Username, config.Config.Database.Password, config.Config.Database.Name, config.Config.Database.Host, config.Config.Database.Port)
 	localDb, err := sqlx.Connect("postgres", connString)
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	db = localDb
+	return localDb, nil
 }
 
 func Migrate() error {
-	db, err := sql.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.Config.Database.Username, config.Config.Database.Password, config.Config.Database.Host, config.Config.Database.Port, config.Config.Database.Password))
+	db, err := connect()
 	if err != nil {
 		return err
 	}
 
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
 	if err != nil {
 		return err
 	}

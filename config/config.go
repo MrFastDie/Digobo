@@ -3,6 +3,7 @@ package config
 import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -47,7 +48,7 @@ func Init() {
 
 	configFileFound, conf := reader(dir + "/config.yaml")
 	if !configFileFound {
-		panic("Cant find config file")
+		log.Fatal("Cant find config file")
 	}
 
 	Config = conf
